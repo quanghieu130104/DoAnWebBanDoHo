@@ -1,0 +1,128 @@
+﻿@model DoAnWebBanDoHo.Models.Order
+@using DoAnWebBanDoHo.Models
+
+@{
+    ViewData["Title"] = "Thanh Toán";
+    var cartItems = ViewBag.CartItems as List<CartItem>;
+    var cartSubtotal = (decimal)ViewBag.CartSubtotal; // Lấy tổng tiền chưa giảm giá từ ViewBag
+    var cartTotalPrice = (decimal)ViewBag.CartTotalPrice; // Lấy tổng tiền sau giảm giá từ ViewBag
+    var appliedDiscount = ViewBag.AppliedDiscount as Discount; // Lấy mã giảm giá đã áp dụng từ ViewBag
+}
+
+<div class="container py-5">
+    <h1 class="display-4 text-center mb-5">Tiến Hành Thanh Toán</h1>
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="row">
+        <div class="col-md-7">
+            <div class="card shadow-sm border-0 rounded-lg mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Thông Tin Giao Hàng</h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="PlaceOrder" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <div class="mb-3">
+                            <label asp-for="ReceiverName" class="form-label"></label>
+                            <input asp-for="ReceiverName" class="form-control" />
+                            <span asp-validation-for="ReceiverName" class="text-danger"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="PhoneNumber" class="form-label"></label>
+                            <input asp-for="PhoneNumber" class="form-control" />
+                            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="Email" class="form-label"></label>
+                            <input asp-for="Email" class="form-control" />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="ShippingAddress" class="form-label"></label>
+                            <textarea asp-for="ShippingAddress" class="form-control" rows="3"></textarea>
+                            <span asp-validation-for="ShippingAddress" class="text-danger"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="Notes" class="form-label"></label>
+                            <textarea asp-for="Notes" class="form-control" rows="2"></textarea>
+                            <span asp-validation-for="Notes" class="text-danger"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="PaymentMethod" class="form-label"></label>
+                            <select asp-for="PaymentMethod" class="form-select">
+                                <option value="Thanh toán khi nhận hàng (COD)">Thanh toán khi nhận hàng (COD)</option>
+                                <option value="Chuyển khoản ngân hàng">Chuyển khoản ngân hàng</option>
+                                <!-- Có thể thêm các phương thức thanh toán khác ở đây -->
+                            </select>
+                            <span asp-validation-for="PaymentMethod" class="text-danger"></span>
+                        </div>
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-success btn-lg">Xác Nhận Đặt Hàng</button>
+                            <a asp-action="Index" asp-controller="Cart" class="btn btn-outline-secondary">Quay lại giỏ hàng</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-5">
+            <div class="card shadow-sm border-0 rounded-lg">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">Tóm Tắt Đơn Hàng</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush mb-3">
+                        @foreach (var item in cartItems)
+                        {
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-0 text-primary">@item.ProductName</h6>
+                                    <small class="text-muted">Số lượng: @item.Quantity x @(item.DiscountedPrice.HasValue? item.DiscountedPrice.Value.ToString("C0", new System.Globalization.CultureInfo("vi-VN")) : item.Price.ToString("C0", new System.Globalization.CultureInfo("vi-VN")))</small>
+                                </div>
+                                <span class="fw-bold">@item.TotalPrice.ToString("C0", new System.Globalization.CultureInfo("vi-VN"))</span>
+                            </li>
+                        }
+                    </ul>
+                    <hr />
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span>Tổng tiền hàng:</span>
+                        <span class="fw-bold">@cartSubtotal.ToString("C0", new System.Globalization.CultureInfo("vi-VN"))</span>
+                    </div>
+
+                    @if (appliedDiscount != null)
+                    {
+                        <div class="d-flex justify-content-between align-items-center mb-2 text-success">
+                            <span>Mã giảm giá (@appliedDiscount.Code):</span>
+                            @if (appliedDiscount.DiscountType == "Percentage")
+                            {
+                                <span>- @appliedDiscount.DiscountValue.ToString("N0")%</span>
+                            }
+                            else
+                            {
+                                <span>- @(cartSubtotal - cartTotalPrice).ToString("C0", new System.Globalization.CultureInfo("vi-VN"))</span>
+                            }
+                        </div>
+                    }
+
+                    <div class="d-flex justify-content-between align-items-center bg-light p-2 rounded fw-bold text-primary border-top mt-3">
+                        <span>Tổng Thanh Toán:</span>
+                        <span class="h5">@cartTotalPrice.ToString("C0", new System.Globalization.CultureInfo("vi-VN"))</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

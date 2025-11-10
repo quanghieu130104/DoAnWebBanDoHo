@@ -1,0 +1,461 @@
+﻿@model DoAnWebBanDoHo.Models.Product
+@using DoAnWebBanDoHo.Areas.Identity.Data
+@using Microsoft.AspNetCore.Identity
+@using DoAnWebBanDoHo.Models
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
+@{
+    ViewData["Title"] = Model.Name;
+
+    // Tính phần trăm giảm giá
+    int? discountPercent = null;
+    if (Model.DiscountedPrice.HasValue && Model.Price > 0 && Model.DiscountedPrice < Model.Price)
+    {
+        discountPercent = (int)Math.Round((1 - ((decimal)Model.DiscountedPrice.Value / Model.Price)) * 100);
+    }
+
+    // Xác định giá hiển thị
+    var displayPrice = Model.DiscountedPrice.HasValue ? Model.DiscountedPrice.Value : Model.Price;
+    var oldPrice = Model.DiscountedPrice.HasValue ? (decimal?)Model.Price : null;
+
+    // Ảnh chính fallback
+    var mainImage = string.IsNullOrEmpty(Model.ImageUrl) ? "/images/placeholder.jpg" : Model.ImageUrl;
+
+    // Danh sách mã giảm giá
+    var discounts = ViewBag.Discounts as List<Discount>;
+}
+
+<link rel="stylesheet" href="~/css/product-details.css" asp-append-version="true" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+<div class="container mt-5 product-details-page">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Trang chủ</a></li>
+            @if (Model.Category != null)
+            {
+                <li class="breadcrumb-item">
+                    <a asp-controller="Home" asp-action="Index" asp-route-categoryId="@Model.CategoryId">@Model.Category.Name</a>
+                </li>
+            }
+            <li class="breadcrumb-item active" aria-current="page">@Model.Name</li>
+        </ol>
+    </nav>
+    <hr />
+
+    <div class="row g-5">
+        <!-- CỘT ẢNH -->
+        <div class="col-md-6">
+            <div class="main-image-container mb-3">
+                <img id="main-product-image" src="@mainImage" class="img-fluid rounded shadow-sm" alt="@Model.Name" />
+            </div>
+            <div class="thumbnail-container">
+                @if (!string.IsNullOrEmpty(Model.ImageUrl) && Model.ImageUrl != "/images/placeholder.jpg")
+                {
+                    <img class="product-thumbnail active" src="@mainImage" data-large-src="@mainImage" alt="Ảnh chính" />
+                }
+                @if (Model.ProductImages != null && Model.ProductImages.Any())
+                {
+                    @foreach (var image in Model.ProductImages)
+                    {
+                        <img class="product-thumbnail" src="@image.ImageUrl" data-large-src="@image.ImageUrl" alt="Ảnh phụ" />
+                    }
+                }
+            </div>
+        </div>
+
+        <!-- CỘT THÔNG TIN -->
+        <div class="col-md-6">
+            @if (Model.Category != null)
+            {
+                <h4 class="product-brand text-uppercase">@Model.Category.Name</h4>
+            }
+            <h1 class="product-title">@Model.Name</h1>
+
+            <div class="product-meta">
+                @if (!string.IsNullOrEmpty(Model.SKU))
+                {
+                    <span>Mã SP: @Model.SKU</span>
+                }
+                @if (Model.Category != null)
+                {
+                    <span class="mx-2">|</span>
+                    <span>Danh mục: @Model.Category.Name</span>
+                }
+                <span class="mx-2">|</span>
+                <span class="product-review">
+                    <i class="fas fa-star text-warning"></i><i class="fas fa-star text-warning"></i>
+                    <i class="fas fa-star text-warning"></i><i class="fas fa-star text-warning"></i>
+                    <i class="fas fa-star text-warning"></i>
+                    (@((int)(ViewBag.ReviewCount ?? 0))) <a href="#reviewsSection">Viết đánh giá</a>
+                </span>
+            </div>
+
+            <div class="product-price-box my-4">
+                <span class="product-price-new">@displayPrice.ToString("N0") đ</span>
+                @if (oldPrice.HasValue)
+                {
+                    <span class="product-price-old">@oldPrice.Value.ToString("N0") đ</span>
+                }
+                @if (discountPercent.HasValue)
+                {
+                    <span class="product-discount-badge">GIẢM @discountPercent%</span>
+                }
+            </div>
+
+            <p class="product-stock-status mb-4">
+                Tình trạng:
+                @if (Model.StockQuantity > 0)
+                {
+                    <span class="badge bg-success">Còn hàng (@Model.StockQuantity)</span>
+                }
+                else
+                {
+                    <span class="badge bg-danger">Hết hàng</span>
+                }
+            </p>
+
+            <ul class="product-attributes list-unstyled">
+                @if (!string.IsNullOrEmpty(Model.Gender))
+                {
+                    <li><strong>Giới tính:</strong> @Model.Gender</li>
+                }
+                @if (!string.IsNullOrEmpty(Model.Material))
+                {
+                    <li><strong>Chất liệu:</strong> @Model.Material</li>
+                }
+                @if (!string.IsNullOrEmpty(Model.Origin))
+                {
+                    <li><strong>Xuất xứ:</strong> @Model.Origin</li>
+                }
+            </ul>
+
+            <div class="product-extra-info mt-4">
+                <p>
+                    <i class="fas fa-phone-alt"></i> Gọi đặt mua:
+                    <a href="tel:0792126564" class="text-danger fw-bold text-decoration-none">0792126564</a> (08:00 - 21:00)
+                </p>
+                <p><i class="fas fa-shipping-fast"></i> Freeship nội thành Hà Nội & TP. Hồ Chí Minh</p>
+            </div>
+
+            <div class="promo-codes mt-3">
+                <label class="fw-bold">Mã giảm giá:</label>
+                <div class="d-flex gap-2 mt-2">
+                    <button type="button" class="btn btn-link p-0 border-0" data-bs-toggle="modal" data-bs-target="#discountCodeModal">Xem mã</button>
+                </div>
+            </div>
+
+            <div class="mt-4 d-flex align-items-center gap-2">
+                @if (SignInManager.IsSignedIn(User) && !User.IsInRole("Admin"))
+                {
+                    <form asp-controller="Cart" asp-action="AddToCart" method="post" class="d-inline-block me-2">
+                        <input type="hidden" name="productId" value="@Model.Id" />
+                        <div class="input-group" style="max-width:150px;">
+                            <input type="number" name="quantity" value="1" min="1" max="@Model.StockQuantity"
+                                   class="form-control text-center quantity-input" @(Model.StockQuantity <= 0 ? "disabled" : "") />
+                            <button type="submit" class="btn btn-primary btn-add-to-cart" @(Model.StockQuantity <= 0 ? "disabled" : "")>
+                                <i class="fas fa-cart-plus"></i>
+                            </button>
+                        </div>
+                    </form>
+                    <a asp-controller="Cart" asp-action="BuyNow" asp-route-productId="@Model.Id"
+                       class="btn btn-danger btn-buy-now @(Model.StockQuantity <= 0 ? "disabled" : "")">Mua ngay</a>
+                }
+                else if (!SignInManager.IsSignedIn(User))
+                {
+                    <a asp-area="Identity" asp-page="/Account/Login" asp-route-returnUrl="@Context.Request.Path"
+                       class="btn btn-primary"><i class="fas fa-cart-plus"></i> Đăng nhập để mua hàng</a>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- MÔ TẢ -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="product-description card shadow-sm">
+                <div class="card-header bg-light"><h4 class="mb-0">Mô tả sản phẩm</h4></div>
+                <div class="card-body">@Html.Raw(Model.Description ?? "Chưa có mô tả cho sản phẩm này.")</div>
+                <div class="card-footer text-muted small">
+                    Ngày tạo: @Html.DisplayFor(model => model.CreatedDate) |
+                    Cập nhật: @Html.DisplayFor(model => model.LastUpdated)
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL MÃ GIẢM GIÁ -->
+<div class="modal fade" id="discountCodeModal" tabindex="-1" aria-labelledby="discountCodeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Mã Giảm Giá Hiện Có</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                @if (discounts != null && discounts.Any())
+                {
+                    @foreach (var discount in discounts)
+                    {
+                        <div class="discount-item card mb-3">
+                            <div class="card-body d-flex align-items-center justify-content-between">
+                                <div class="d-flex align-items-center">
+                                    <div class="brand-logo me-3 text-center" style="width:60px;">
+                                        <i class="fas fa-tags fa-2x text-muted"></i>
+                                        <small class="d-block text-muted">VOUCHER</small>
+                                    </div>
+                                    <div>
+                                        <p class="mb-1">
+                                            Nhập <strong class="text-danger">@discount.Code</strong>
+                                            @if (discount.DiscountType == "Percentage")
+                                            {
+                                                <span>để giảm @discount.DiscountValue%</span>
+                                            }
+                                            else
+                                            {
+                                                <span>để giảm @discount.DiscountValue.ToString("N0")đ</span>
+                                            }
+                                            @if (discount.MinimumOrderAmount.HasValue && discount.MinimumOrderAmount > 0)
+                                            {
+                                                <span> cho đơn hàng từ @discount.MinimumOrderAmount.Value.ToString("N0")đ</span>
+                                            }
+                                        </p>
+                                        <small class="text-muted">
+                                            Hạn: @discount.EndDate.ToString("dd/MM/yyyy") |
+                                            <a asp-controller="Discounts" asp-action="Details" asp-route-id="@discount.Id" target="_blank" class="text-decoration-none">Điều kiện</a>
+                                        </small>
+                                    </div>
+                                </div>
+                                <button class="btn btn-outline-danger btn-sm copy-discount-code" data-code="@discount.Code">LẤY MÃ</button>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <p class="text-center text-muted">Hiện tại không có mã giảm giá nào.</p>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- PHẦN ĐÁNH GIÁ -->
+<div class="container mt-5" id="reviewsSection">
+    <div class="row">
+        <div class="col-12">
+            <h3 class="mb-4">Đánh giá & Bình luận (@((int)(ViewBag.ReviewCount ?? 0)))</h3>
+
+            @if (TempData["ReviewSuccess"] != null)
+            {
+                <div class="alert alert-success">@TempData["ReviewSuccess"]</div>
+            }
+            @if (TempData["ReviewError"] != null)
+            {
+                <div class="alert alert-danger">@TempData["ReviewError"]</div>
+            }
+
+            <!-- Tổng quan đánh giá -->
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-body p-4">
+                    <div class="row">
+                        <div class="col-md-4 text-center border-end">
+                            @if ((int)(ViewBag.ReviewCount ?? 0) > 0)
+                            {
+                                <h4 class="display-4 fw-bold text-danger mb-0">
+                                    @(((double)(ViewBag.AverageRating ?? 0.0)).ToString("0.0"))<span class="fs-4 text-muted">/5</span>
+                                </h4>
+                                <div class="rating-display-lg">
+                                    @for (int i = 1; i <= 5; i++)
+                                    {
+                                        <i class="fa-star @(i <= Math.Round((double)(ViewBag.AverageRating ?? 0.0)) ? "fas text-warning" : "far text-muted")"></i>
+                                    }
+                                </div>
+                                <p class="text-muted mt-2 mb-0">(@ViewBag.ReviewCount đánh giá)</p>
+                            }
+                            else
+                            {
+                                <p class="text-muted my-5">Chưa có đánh giá nào.</p>
+                            }
+                        </div>
+
+                        <div class="col-md-8 ps-md-4">
+                            @{
+                                var ratingCountsDict = ViewBag.RatingCounts as Dictionary<int, int>;
+                            }
+
+                            @for (int star = 5; star >= 1; star--)
+                            {
+                                int count = 0;
+                                double percentage = 0;
+
+                                if (ratingCountsDict != null && ratingCountsDict.ContainsKey(star))
+                                    count = ratingCountsDict[star];
+
+                                if ((int)(ViewBag.ReviewCount ?? 0) > 0)
+                                    percentage = (double)count / (int)ViewBag.ReviewCount * 100;
+
+                                <div class="d-flex align-items-center mb-1">
+                                    <div class="me-2" style="min-width:50px;">@star <i class="fas fa-star text-warning small"></i></div>
+                                    <div class="progress flex-grow-1" style="height:10px;">
+                                        <div class="progress-bar bg-warning" style="width:@percentage%;" role="progressbar"></div>
+                                    </div>
+                                    <div class="ms-2 text-muted" style="min-width:30px;">(@count)</div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @if (SignInManager.IsSignedIn(User))
+            {
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-header bg-light"><h5 class="mb-0">Viết nhận xét của bạn</h5></div>
+                    <div class="card-body p-4">
+                        <form asp-action="AddReview" asp-controller="Home" method="post">
+                            <input type="hidden" name="productId" value="@Model.Id" />
+                            <div class="mb-3">
+                                <label class="fw-bold">Đánh giá của bạn (chọn sao):</label>
+                                <div class="rating-stars">
+                                    @for (int i = 5; i >= 1; i--)
+                                    {
+                                        <input type="radio" id="star@(i)" name="rating" value="@i" class="d-none" required />
+                                        <label for="star@(i)" title="@i sao"><i class="far fa-star"></i></label>
+                                    }
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="comment" class="fw-bold">Bình luận:</label>
+                                <textarea id="comment" name="comment" class="form-control" rows="4" placeholder="Chia sẻ cảm nhận của bạn..."></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary"><i class="fas fa-paper-plane me-2"></i>Gửi đánh giá</button>
+                        </form>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info text-center">
+                    Vui lòng <a asp-area="Identity" asp-page="/Account/Login" asp-route-returnUrl="@Context.Request.Path" class="alert-link">đăng nhập</a> để viết đánh giá.
+                </div>
+            }
+
+            <!-- Danh sách review -->
+            <div class="reviews-list mt-4">
+                @if (Model.Reviews != null && Model.Reviews.Any(r => r.IsApproved))
+                {
+                    @foreach (var review in Model.Reviews.Where(r => r.IsApproved).OrderByDescending(r => r.ReviewDate))
+                    {
+                        <div class="review-item d-flex mb-4 pb-3 border-bottom">
+                            <div class="review-avatar me-3">
+                                <span>@(review.ReviewerName?.FirstOrDefault().ToString().ToUpper() ?? "?")</span>
+                            </div>
+                            <div class="review-content">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="fw-bold">@review.ReviewerName</span>
+                                    <small class="text-muted">@review.ReviewDate.ToString("HH:mm, dd/MM/yyyy")</small>
+                                </div>
+                                <div class="rating-display my-2">
+                                    @for (int i = 1; i <= 5; i++)
+                                    {
+                                        <i class="fa-star small @(i <= review.Rating ? "fas text-warning" : "far text-muted")"></i>
+                                    }
+                                </div>
+                                <p class="review-comment mb-0">@review.Comment</p>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <p class="text-muted text-center">Chưa có bình luận nào cho sản phẩm này.</p>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .rating-stars {
+            display: inline-flex;
+            flex-direction: row-reverse;
+            justify-content: flex-end;
+        }
+
+            .rating-stars input {
+                display: none;
+            }
+
+            .rating-stars label {
+                padding: 0 3px;
+                font-size: 1.8rem;
+                color: #ddd;
+                cursor: pointer;
+                transition: color 0.2s;
+            }
+
+                .rating-stars input:checked ~ label, .rating-stars label:hover, .rating-stars label:hover ~ label {
+                    color: #ffc107;
+                }
+
+        .rating-display i {
+            font-size: 1.2rem;
+        }
+
+        .product-thumbnail {
+            width: 70px;
+            height: 70px;
+            object-fit: cover;
+            cursor: pointer;
+            border-radius: 6px;
+            margin-right: 5px;
+            border: 2px solid transparent;
+            transition: 0.3s;
+        }
+
+            .product-thumbnail.active, .product-thumbnail:hover {
+                border-color: #007bff;
+            }
+
+        .review-avatar {
+            width: 45px;
+            height: 45px;
+            background: #f0f0f0;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #555;
+            font-size: 1.1rem;
+        }
+    </style>
+}
+
+@section Scripts {
+    <script>
+        document.querySelectorAll('.product-thumbnail').forEach(img => {
+            img.addEventListener('click', () => {
+                document.querySelectorAll('.product-thumbnail').forEach(th => th.classList.remove('active'));
+                img.classList.add('active');
+                document.getElementById('main-product-image').src = img.dataset.largeSrc;
+            });
+        });
+
+        document.querySelectorAll('.copy-discount-code').forEach(btn => {
+            btn.addEventListener('click', () => {
+                navigator.clipboard.writeText(btn.dataset.code);
+                btn.textContent = 'ĐÃ SAO CHÉP!';
+                btn.classList.add('btn-success');
+                setTimeout(() => {
+                    btn.textContent = 'LẤY MÃ';
+                    btn.classList.remove('btn-success');
+                }, 2000);
+            });
+        });
+    </script>
+}

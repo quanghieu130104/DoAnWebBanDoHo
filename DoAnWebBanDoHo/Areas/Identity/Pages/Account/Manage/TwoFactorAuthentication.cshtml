@@ -1,0 +1,92 @@
+﻿@page
+@using Microsoft.AspNetCore.Http.Features
+@model TwoFactorAuthenticationModel
+@{
+    ViewData["Title"] = "Xác thực hai yếu tố (2FA)";
+    ViewData["ActivePage"] = ManageNavPages.TwoFactorAuthentication;
+   
+}
+
+<div class="main-content-wrapper">
+    <div class="login-card p-4 text-start"> @* Sử dụng login-card và căn trái nội dung *@
+        
+        <h3 class="text-center mb-4">@ViewData["Title"]</h3>
+        <partial name="_StatusMessage" for="StatusMessage" />
+        
+        @{
+            var consentFeature = HttpContext.Features.Get<ITrackingConsentFeature>();
+            @if (consentFeature?.CanTrack ?? true)
+            {
+                // TRƯỜNG HỢP 2FA ĐÃ BẬT
+                @if (Model.Is2faEnabled)
+                {
+                    <h4 class="mb-3">Mã Khôi phục</h4>
+                    
+                    // Cảnh báo hết mã khôi phục
+                    if (Model.RecoveryCodesLeft == 0)
+                    {
+                        <div class="alert alert-danger">
+                            <strong>Bạn không còn mã khôi phục nào.</strong>
+                            <p class="mb-0">Bạn phải <a asp-page="./GenerateRecoveryCodes" class="alert-link">tạo một bộ mã khôi phục mới</a> trước khi có thể đăng nhập bằng mã khôi phục.</p>
+                        </div>
+                    }
+                    else if (Model.RecoveryCodesLeft == 1)
+                    {
+                        <div class="alert alert-danger">
+                            <strong>Bạn còn lại 1 mã khôi phục.</strong>
+                            <p class="mb-0">Bạn nên <a asp-page="./GenerateRecoveryCodes" class="alert-link">tạo một bộ mã khôi phục mới</a>.</p>
+                        </div>
+                    }
+                    else if (Model.RecoveryCodesLeft <= 3)
+                    {
+                        <div class="alert alert-warning">
+                            <strong>Bạn còn lại @Model.RecoveryCodesLeft mã khôi phục.</strong>
+                            <p class="mb-0">Bạn nên <a asp-page="./GenerateRecoveryCodes" class="alert-link">tạo một bộ mã khôi phục mới</a>.</p>
+                        </div>
+                    }
+
+                    <h4 class="mt-4 mb-3">Tùy chọn</h4>
+                    <div class="d-flex flex-wrap gap-2 mb-4">
+                        
+                        @if (Model.IsMachineRemembered)
+                        {
+                            <form method="post" class="d-inline-block">
+                                <button type="submit" class="btn btn-warning">Quên trình duyệt này</button>
+                            </form>
+                        }
+                        
+                        <a asp-page="./Disable2fa" class="btn btn-danger">Vô hiệu hóa 2FA</a>
+                        <a asp-page="./GenerateRecoveryCodes" class="btn btn-primary">Tạo lại mã khôi phục</a>
+                    </div>
+                }
+
+                <h4 class="@(Model.Is2faEnabled ? "mt-4" : "mt-0") mb-3">Ứng dụng xác thực (Authenticator)</h4>
+                @if (!Model.HasAuthenticator)
+                {
+                    // Nút Thêm Authenticator
+                    <a id="enable-authenticator" asp-page="./EnableAuthenticator" class="btn btn-success">Thêm ứng dụng xác thực</a>
+                }
+                else
+                {
+                    // Các tùy chọn khi Authenticator đã được thiết lập
+                    <div class="d-flex flex-wrap gap-2">
+                        <a id="setup-authenticator" asp-page="./EnableAuthenticator" class="btn btn-success">Cấu hình ứng dụng xác thực</a>
+                        <a id="reset-authenticator" asp-page="./ResetAuthenticator" class="btn btn-warning">Đặt lại ứng dụng xác thực</a>
+                    </div>
+                }
+            }
+            // TRƯỜNG HỢP CHƯA CHẤP NHẬN CHÍNH SÁCH COOKIE
+            else
+            {
+                <div class="alert alert-danger">
+                    <strong>Chính sách quyền riêng tư và cookie chưa được chấp nhận.</strong>
+                    <p class="mb-0">Bạn phải chấp nhận chính sách trước khi có thể bật xác thực hai yếu tố.</p>
+                </div>
+            }
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

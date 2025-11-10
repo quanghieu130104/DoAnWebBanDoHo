@@ -1,0 +1,61 @@
+﻿@page
+@model EmailModel
+@{
+    ViewData["Title"] = "Quản lý Email";
+    ViewData["ActivePage"] = ManageNavPages.Email;
+}
+
+<div class="main-content-wrapper">
+    <div class="login-card p-4">
+        @* Sử dụng login-card để căn giữa và định dạng *@
+
+        <h3 class="text-center mb-4">@ViewData["Title"]</h3>
+        <partial name="_StatusMessage" for="StatusMessage" />
+
+        <div class="row justify-content-center">
+            <div class="col-md-12">
+                <form id="email-form" method="post">
+                    <div asp-validation-summary="All" class="text-danger mb-4" role="alert"></div>
+
+                    @if (Model.IsEmailConfirmed)
+                    {
+                        <div class="form-floating mb-3 input-group">
+                            <input asp-for="Email" class="form-control" placeholder="Email hiện tại" disabled />
+                            <label asp-for="Email" class="form-label">Email hiện tại</label>
+
+                            <div class="input-group-append">
+                                <span class="input-group-text text-success font-weight-bold" style="height: 55px; line-height: 40px;">✓ Đã xác nhận</span>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="form-floating mb-3">
+                            <input asp-for="Email" class="form-control" placeholder="Email hiện tại" disabled />
+                            <label asp-for="Email" class="form-label">Email hiện tại</label>
+
+                            <div class="mt-2 text-start">
+                                <button id="email-verification" type="submit" asp-page-handler="SendVerificationEmail" class="btn btn-sm btn-link p-0">
+                                    Gửi lại email xác nhận
+                                </button>
+                                <span class="text-danger small ms-2">(Chưa xác nhận)</span>
+                            </div>
+                        </div>
+                    }
+
+                    <div class="form-floating mb-4">
+                        <input asp-for="Input.NewEmail" class="form-control" autocomplete="email" aria-required="true" placeholder="Email mới." />
+                        <label asp-for="Input.NewEmail" class="form-label">Email mới</label>
+                        <span asp-validation-for="Input.NewEmail" class="text-danger"></span>
+                    </div>
+
+                    <button id="change-email-button" type="submit" asp-page-handler="ChangeEmail" class="w-100 btn btn-lg btn-custom-dark">THAY ĐỔI EMAIL</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

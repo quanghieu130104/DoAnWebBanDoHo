@@ -1,0 +1,137 @@
+﻿@model DoAnWebBanDoHo.Models.Order
+
+@{
+    ViewData["Title"] = "Chi tiết Đơn hàng: #" + Model.Id;
+}
+
+<div class="container py-4">
+    <h1 class="mb-4">Chi tiết Đơn hàng: <span class="text-primary">#ORD@Model.Id</span></h1>
+    <hr />
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0 rounded-lg mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">Thông Tin Khách Hàng & Giao Hàng</h5>
+                </div>
+                <div class="card-body">
+                    <dl class="row">
+                        <dt class="col-sm-4">Tên Người Nhận:</dt>
+                        <dd class="col-sm-8">@Html.DisplayFor(model => model.ReceiverName)</dd>
+
+                        <dt class="col-sm-4">Email:</dt>
+                        <dd class="col-sm-8">@Html.DisplayFor(model => model.Email)</dd>
+
+                        <dt class="col-sm-4">Số Điện Thoại:</dt>
+                        <dd class="col-sm-8">@Html.DisplayFor(model => model.PhoneNumber)</dd>
+
+                        <dt class="col-sm-4">Địa Chỉ Giao Hàng:</dt>
+                        <dd class="col-sm-8">@Html.DisplayFor(model => model.ShippingAddress)</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0 rounded-lg mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">Thông Tin Đơn Hàng</h5>
+                </div>
+                <div class="card-body">
+                    <dl class="row">
+                        <dt class="col-sm-4">Ngày Đặt Hàng:</dt>
+                        <dd class="col-sm-8">@Html.DisplayFor(model => model.OrderDate)</dd>
+
+                        <dt class="col-sm-4">Trạng Thái:</dt>
+                        <dd class="col-sm-8">
+                            @{
+                                string badgeClass = Model.OrderStatus switch
+                                {
+                                    "Chờ xác nhận" => "bg-warning text-dark",
+                                    "Đã xác nhận" => "bg-info text-dark",
+                                    "Đang giao" => "bg-primary",
+                                    "Đã giao" => "bg-success",
+                                    "Đã hủy" => "bg-danger",
+                                    _ => "bg-secondary"
+                                };
+                            }
+                            <span class="badge @badgeClass">@Html.DisplayFor(model => model.OrderStatus)</span>
+                        </dd>
+
+                        <dt class="col-sm-4">Phương Thức TT:</dt>
+                        <dd class="col-sm-8">@Html.DisplayFor(model => model.PaymentMethod)</dd>
+
+                        <dt class="col-sm-4">Tổng Tiền:</dt>
+                        <dd class="col-sm-8 fw-bold text-primary">@Model.TotalAmount.ToString("C0", new System.Globalization.CultureInfo("vi-VN"))</dd>
+
+                        <dt class="col-sm-4">Ghi Chú:</dt>
+                        <dd class="col-sm-8">@(string.IsNullOrEmpty(Model.Notes) ? "Không có" : Model.Notes)</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0 rounded-lg mb-4">
+        <div class="card-header bg-dark text-white">
+            <h5 class="mb-0">Các Sản Phẩm Trong Đơn Hàng</h5>
+        </div>
+        <div class="card-body">
+            @if (Model.OrderItems != null && Model.OrderItems.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Ảnh</th>
+                                <th>Sản Phẩm</th>
+                                <th>Giá Đặt</th>
+                                <th>Số Lượng</th>
+                                <th>Tổng Cộng</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.OrderItems)
+                            {
+                                <tr>
+                                    <td class="align-middle text-center" style="width: 100px;">
+                                        <img src="@(string.IsNullOrEmpty(item.Product?.ImageUrl) ? "https://placehold.co/80x60/e0e0e0/ffffff?text=No+Image" : item.Product?.ImageUrl)"
+                                             alt="@item.ProductName" style="max-width: 80px; height: auto; border-radius: 5px;">
+                                    </td>
+                                    <td class="align-middle">
+                                        <a asp-controller="Home" asp-action="Details" asp-route-id="@item.ProductId" class="text-decoration-none text-primary fw-bold">
+                                            @Html.DisplayFor(modelItem => item.ProductName)
+                                        </a>
+                                    </td>
+                                    <td class="align-middle">
+                                        @if (item.DiscountedPrice.HasValue && item.DiscountedPrice < item.Price)
+                                        {
+                                            <span class="text-muted text-decoration-line-through">@item.Price.ToString("C0", new System.Globalization.CultureInfo("vi-VN"))</span>
+                                
+                                            <br />
+                                            <span class="text-success fw-bold">@item.DiscountedPrice.Value.ToString("C0", new System.Globalization.CultureInfo("vi-VN"))</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="fw-bold">@item.Price.ToString("C0", new System.Globalization.CultureInfo("vi-VN"))</span>
+                                        }
+                                    </td>
+                                    <td class="align-middle">@Html.DisplayFor(modelItem => item.Quantity)</td>
+                                    <td class="align-middle fw-bold">@item.TotalItemPrice.ToString("C0", new System.Globalization.CultureInfo("vi-VN"))</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <p class="text-muted">Không có sản phẩm nào trong đơn hàng này.</p>
+            }
+        </div>
+    </div>
+
+    <div class="mt-4 text-center">
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary me-2">Sửa Trạng Thái Đơn Hàng</a>
+        <a asp-action="Index" class="btn btn-secondary">Quay Lại Danh Sách Đơn Hàng</a>
+    </div>
+</div>

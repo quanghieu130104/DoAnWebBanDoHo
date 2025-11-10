@@ -1,0 +1,49 @@
+﻿@model DoAnWebBanDoHo.Models.Category
+
+@{
+    ViewData["Title"] = "Tạo Danh Mục Mới";
+}
+
+<h1>Tạo Danh Mục Mới</h1>
+
+<hr />
+<div class="row">
+    <div class="col-md-6">
+        @* Tăng chiều rộng cột nếu muốn *@
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div> @* Thêm mb-3 *@
+
+            <div class="form-group mb-3">
+                @* Thêm mb-3 *@
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                @* Thêm mb-3 *@
+                <label asp-for="Description" class="control-label"></label>
+                @* Dùng textarea cho Mô tả *@
+                <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mt-4">
+                @* Thêm mt-4 *@
+                <input type="submit" value="Tạo Mới" class="btn btn-primary" />
+                <a asp-action="Index" class="btn btn-secondary">Quay Lại Danh Sách</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@* Comment out nút Back to List ở đây nếu đã di chuyển vào form *@
+@* <div>
+    <a asp-action="Index">Back to List</a>
+</div> *@
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

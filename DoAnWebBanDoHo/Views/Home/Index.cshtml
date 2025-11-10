@@ -1,0 +1,186 @@
+﻿@using DoAnWebBanDoHo.Models
+@model IEnumerable<DoAnWebBanDoHo.Models.Product>
+
+@{
+    ViewData["Title"] = "Trang Chủ - Cửa Hàng Đồng Hồ";
+    var categories = ViewData["CategoryId"] as SelectList;
+    var currentSearchTerm = ViewData["CurrentSearchTerm"] as string; // Vẫn giữ lại để dùng nếu lọc qua URL
+    var banners = ViewBag.Banners as List<Banner>;
+}
+
+@if (banners != null && banners.Count > 0)
+{
+    <div id="heroCarousel" class="carousel slide shadow-sm mb-4" data-bs-ride="carousel">
+        <div class="carousel-indicators">
+            @for (int i = 0; i < banners.Count; i++)
+            {
+                <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="@i" class="@(i == 0 ? "active" : "")" aria-current="@(i == 0 ? "true" : "false")" aria-label="Slide @(i + 1)"></button>
+            }
+        </div>
+        <div class="carousel-inner">
+            @for (int i = 0; i < banners.Count; i++)
+            {
+                var banner = banners[i];
+                <div class="carousel-item @(i == 0 ? "active" : "")">
+                    @if (!string.IsNullOrEmpty(banner.LinkUrl))
+                    {
+                        <a href="@banner.LinkUrl" target="_blank">
+                            <img src="@banner.ImageUrl" class="d-block w-100 banner-image-full" alt="@banner.Title">
+                        </a>
+                    }
+                    else
+                    {
+                        <img src="@banner.ImageUrl" class="d-block w-100 banner-image-full" alt="@banner.Title">
+                    }
+                    @if (!string.IsNullOrEmpty(banner.Title) || !string.IsNullOrEmpty(banner.Description))
+                    {
+                        <div class="carousel-caption d-none d-md-block">
+                            @if (!string.IsNullOrEmpty(banner.Title))
+                            {
+                                <h5>@banner.Title</h5>
+                            }
+                            @if (!string.IsNullOrEmpty(banner.Description))
+                            {
+                                <p>@banner.Description</p>
+                            }
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+    </div>
+}
+<div class="container">
+
+    <div class="d-flex justify-content-between align-items-center mb-4 pt-3">
+        @* Thêm pt-3 để có khoảng cách với banner *@
+        <h2 class="mb-0">Sản Phẩm Nổi Bật</h2>
+
+    </div>
+
+    @if (Model != null && Model.Any())
+    {
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            @foreach (var item in Model)
+            {
+                <div class="col">
+                    <div class="card h-100 shadow-sm border-0 rounded-lg product-card-hover">
+                        <a asp-controller="Home" asp-action="Details" asp-route-id="@item.Id" class="text-center product-card-image-link">
+                            <img src="@(string.IsNullOrEmpty(item.ImageUrl) ? "https://placehold.co/400x300/e0e0e0/ffffff?text=No+Image" : item.ImageUrl)"
+                                 class="card-img-top p-3 rounded-lg"
+                                 alt="@item.Name"
+                                 style="object-fit: contain; height: 200px;">
+                        </a>
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title product-card-title">
+                                <a asp-controller="Home" asp-action="Details" asp-route-id="@item.Id" class="text-primary text-decoration-none stretched-link">
+                                    @Html.DisplayFor(modelItem => item.Name)
+                                </a>
+                            </h5>
+                            <p class="card-text text-muted mb-2 small">@(item.Category?.Name ?? "Chưa phân loại")</p>
+                            <div class="mt-auto">
+                                @{
+                                    var displayPriceCard = item.DiscountedPrice.HasValue ? item.DiscountedPrice.Value : item.Price;
+                                    var oldPriceCard = item.DiscountedPrice.HasValue ? (decimal?)item.Price : null;
+                                }
+                                <p class="card-text product-card-price mb-1">
+                                    <span class="fw-bold text-success">@displayPriceCard.ToString("C0", new System.Globalization.CultureInfo("vi-VN"))</span>
+                                    @if (oldPriceCard.HasValue)
+                                    {
+                                        <small class="text-muted text-decoration-line-through ms-1">@oldPriceCard.Value.ToString("C0", new System.Globalization.CultureInfo("vi-VN"))</small>
+                                    }
+                                </p>
+                                <p class="card-text text-info small mb-3">Tồn kho: @Html.DisplayFor(modelItem => item.StockQuantity)</p>
+                                <a asp-controller="Home" asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary stretched-link-target">Xem chi tiết</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-warning text-center mt-4" role="alert">
+            @* Thêm mt-4 *@
+            Không tìm thấy sản phẩm nào phù hợp.
+        </div>
+    }
+</div>
+
+<style>
+    .banner-image-full {
+        max-height: 60vh;
+        object-fit: cover;
+    }
+
+    .product-card-hover {
+        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        overflow: hidden;
+        border: 1px solid #e9ecef;
+        background-color: #fff;
+    }
+
+        .product-card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1) !important;
+        }
+
+    .product-card-title a {
+        font-size: 1.05rem;
+        font-weight: 600;
+        color: #343a40 !important;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        min-height: 2.8em;
+        text-decoration: none;
+        transition: color 0.2s ease;
+    }
+
+        .product-card-title a:hover {
+            color: #007bff !important;
+            text-decoration: none !important;
+        }
+
+    .product-card-price span.fw-bold {
+        font-size: 1.3rem;
+        font-weight: 700 !important;
+        color: #dc3545 !important;
+    }
+
+    .product-card-price small.text-muted.text-decoration-line-through {
+        font-size: 0.85rem;
+        color: #888 !important;
+    }
+
+    .product-card-hover .btn-outline-primary {
+        font-size: 0.85rem;
+        padding: 0.3rem 0.8rem;
+        border-color: #dee2e6;
+        color: #6c757d;
+    }
+
+        .product-card-hover .btn-outline-primary:hover {
+            background-color: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+
+    .stretched-link-target {
+        position: relative;
+        z-index: 1;
+    }
+</style>
+
+@* Không cần section Scripts *@

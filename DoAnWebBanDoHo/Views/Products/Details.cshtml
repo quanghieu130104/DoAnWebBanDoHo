@@ -1,0 +1,177 @@
+﻿@model DoAnWebBanDoHo.Models.Product
+
+@{
+    ViewData["Title"] = Model.Name;
+
+    // Tính % giảm giá
+    int? discountPercent = null;
+    if (Model.DiscountedPrice.HasValue && Model.Price > 0 && Model.DiscountedPrice < Model.Price)
+    {
+        discountPercent = (int)Math.Round((1 - (Model.DiscountedPrice.Value / Model.Price)) * 100);
+    }
+
+    // Xác định giá bán và giá gốc
+    var displayPrice = Model.DiscountedPrice.HasValue ? Model.DiscountedPrice.Value : Model.Price;
+    var oldPrice = Model.DiscountedPrice.HasValue ? (decimal?)Model.Price : null;
+
+    // Đảm bảo ảnh chính luôn có
+    var mainImage = string.IsNullOrEmpty(Model.ImageUrl) ? "/images/placeholder.jpg" : Model.ImageUrl;
+}
+
+<link rel="stylesheet" href="~/css/product-details.css" asp-append-version="true" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+
+<div class="container mt-5 product-details-page">
+    <div class="row g-5">
+
+        <div class="col-md-6">
+            <div class="main-image-container mb-3">
+                <img id="main-product-image"
+                     src="@mainImage"
+                     class="img-fluid rounded shadow-sm"
+                     alt="@Model.Name">
+            </div>
+
+            <div class="thumbnail-container">
+                <img class="product-thumbnail active"
+                     src="@mainImage"
+                     data-large-src="@mainImage"
+                     alt="Ảnh chính">
+
+                @foreach (var image in Model.ProductImages)
+                {
+                    <img class="product-thumbnail"
+                         src="@image.ImageUrl"
+                         data-large-src="@image.ImageUrl"
+                         alt="Ảnh gallery">
+                }
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            @if (Model.Category != null)
+            {
+                <h4 class="product-brand text-uppercase">@Model.Category.Name</h4>
+            }
+
+            <h1 class="product-title">@Model.Name</h1>
+
+            <div class="product-meta">
+                @if (!string.IsNullOrEmpty(Model.SKU))
+                {
+                    <span>Mã SP: @Model.SKU</span>
+                }
+                @if (Model.Category != null)
+                {
+                    <span class="mx-2">|</span>
+                    <span>Danh mục: @Model.Category.Name</span>
+                }
+                <span class="mx-2">|</span>
+                <span class="product-review">
+                    <i class="fas fa-star text-warning"></i>
+                    <i class="fas fa-star text-warning"></i>
+                    <i class="fas fa-star text-warning"></i>
+                    <i class="fas fa-star text-warning"></i>
+                    <i class="fas fa-star text-warning"></i>
+                    (101) <a href="#">Viết đánh giá</a>
+                </span>
+            </div>
+
+            <div class="product-price-box my-4">
+                <span class="product-price-new">@displayPrice.ToString("N0") đ</span>
+                @if (oldPrice.HasValue)
+                {
+                    <span class="product-price-old">@oldPrice.Value.ToString("N0") đ</span>
+                }
+                @if (discountPercent.HasValue)
+                {
+                    <span class="product-discount-badge">GIẢM @discountPercent%</span>
+                }
+            </div>
+
+            <ul class="product-attributes list-unstyled">
+                @if (!string.IsNullOrEmpty(Model.Gender))
+                {
+                    <li><strong>Giới tính:</strong> <span>@Model.Gender</span></li>
+                }
+                @* Thêm thuộc tính Color nếu bạn đã thêm vào Model *@
+                @* <li><strong>Màu sắc:</strong> <span>@Model.Color</span></li> *@
+                @if (!string.IsNullOrEmpty(Model.Material))
+                {
+                    <li><strong>Chất liệu:</strong> <span>@Model.Material</span></li>
+                }
+                @if (!string.IsNullOrEmpty(Model.Origin))
+                {
+                    <li><strong>Xuất xứ:</strong> <span>@Model.Origin</span></li>
+                }
+            </ul>
+
+            <div class="product-extra-info mt-4">
+                <p><i class="fas fa-phone-alt"></i> Gọi đặt mua: <a href="tel:079216564" class="text-danger fw-bold text-decoration-none">0792126564</a> (08:00 - 21:00)</p>
+                <p><i class="fas fa-shipping-fast"></i> Freeship nội thành Hà Nội & nội thành Hồ Chí Minh</p>
+            </div>
+
+            <div class="promo-codes mt-3">
+                <label class="fw-bold">Mã giảm giá:</label>
+                <div class="d-flex gap-2 mt-2">
+                    <span class="promo-code">Giảm 50.000đ</span>
+                    <span class="promo-code">Giảm 50.000đ</span>
+                </div>
+            </div>
+
+            <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary mt-4">Quay lại trang chủ</a>
+        </div>
+    </div>
+
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="product-description card shadow-sm">
+                <div class="card-header bg-light">
+                    <h4 class="mb-0">Mô tả sản phẩm</h4>
+                </div>
+                <div class="card-body">
+                    @Html.Raw(Model.Description ?? "Chưa có mô tả cho sản phẩm này.")
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const mainImage = document.getElementById('main-product-image');
+            const thumbnails = document.querySelectorAll('.product-thumbnail');
+
+            // Đảm bảo mainImage tồn tại trước khi tiếp tục
+            if (!mainImage) {
+                console.error('Không tìm thấy ảnh chính với ID: main-product-image');
+                return;
+            }
+
+            thumbnails.forEach(function (thumbnail) {
+                thumbnail.addEventListener('click', function () {
+                    // Xóa 'active' khỏi tất cả thumbnails
+                    thumbnails.forEach(t => t.classList.remove('active'));
+
+                    // Thêm 'active' cho thumbnail vừa được nhấp
+                    this.classList.add('active');
+
+                    // Lấy đường dẫn ảnh lớn từ data attribute
+                    const largeImageSrc = this.dataset.largeSrc;
+
+                    // Cập nhật ảnh chính
+                    if (largeImageSrc) {
+                         mainImage.src = largeImageSrc;
+                         // (Tùy chọn) Cập nhật cả alt text nếu cần
+                         // mainImage.alt = this.alt.replace('Thumbnail', 'Ảnh');
+                    } else {
+                        console.warn('Thumbnail không có data-large-src:', this);
+                    }
+                });
+            });
+        });
+    </script>
+}

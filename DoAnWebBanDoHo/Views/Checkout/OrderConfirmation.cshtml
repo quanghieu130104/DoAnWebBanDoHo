@@ -1,0 +1,84 @@
+﻿@model DoAnWebBanDoHo.Models.Order
+
+@{
+    ViewData["Title"] = "Xác Nhận Đặt Hàng";
+}
+
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <h1 class="display-4 text-success"><i class="fas fa-check-circle"></i> Đặt Hàng Thành Công!</h1>
+        <p class="lead">Cảm ơn bạn đã đặt hàng tại cửa hàng của chúng tôi.</p>
+        <p>Mã đơn hàng của bạn là: <span class="fw-bold text-primary">#ORD@Model.Id</span></p>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card shadow-sm border-0 rounded-lg mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Thông Tin Đơn Hàng #ORD@Model.Id</h5>
+                </div>
+                <div class="card-body">
+                    <dl class="row">
+                        <dt class="col-sm-4">Tên Người Nhận:</dt>
+                        <dd class="col-sm-8">@Model.ReceiverName</dd>
+
+                        <dt class="col-sm-4">Số Điện Thoại:</dt>
+                        <dd class="col-sm-8">@Model.PhoneNumber</dd>
+
+                        <dt class="col-sm-4">Địa Chỉ Giao Hàng:</dt>
+                        <dd class="col-sm-8">@Model.ShippingAddress</dd>
+
+                        <dt class="col-sm-4">Email:</dt>
+                        <dd class="col-sm-8">@Model.Email</dd>
+
+                        <dt class="col-sm-4">Ngày Đặt Hàng:</dt>
+                        <dd class="col-sm-8">@Model.OrderDate.ToString("dd/MM/yyyy HH:mm")</dd>
+
+                        <dt class="col-sm-4">Trạng Thái:</dt>
+                        <dd class="col-sm-8"><span class="badge bg-info text-dark">@Model.OrderStatus</span></dd>
+
+                        <dt class="col-sm-4">Phương Thức Thanh Toán:</dt>
+                        <dd class="col-sm-8">@Model.PaymentMethod</dd>
+
+                        <dt class="col-sm-4">Ghi Chú:</dt>
+                        <dd class="col-sm-8">@(string.IsNullOrEmpty(Model.Notes) ? "Không có" : Model.Notes)</dd>
+                    </dl>
+                </div>
+            </div>
+
+            <div class="card shadow-sm border-0 rounded-lg mb-4">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0">Chi Tiết Sản Phẩm Đặt Hàng</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        @foreach (var item in Model.OrderItems)
+                        {
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">
+                                        <a asp-controller="Home" asp-action="Details" asp-route-id="@item.ProductId" class="text-decoration-none text-primary fw-bold">
+                                            @item.ProductName
+                                        </a>
+                                    </h6>
+                                    <small class="text-muted">
+                                        Số lượng: @item.Quantity x @(item.DiscountedPrice.HasValue? item.DiscountedPrice.Value.ToString("C0", new System.Globalization.CultureInfo("vi-VN")) : item.Price.ToString("C0", new System.Globalization.CultureInfo("vi-VN")))
+                                    </small>
+                                </div>
+                                <span class="fw-bold">@item.TotalItemPrice.ToString("C0", new System.Globalization.CultureInfo("vi-VN"))</span>
+                            </li>
+                        }
+                    </ul>
+                    <div class="list-group-item d-flex justify-content-between align-items-center bg-light fw-bold text-primary mt-3">
+                        Tổng Cộng Đơn Hàng:
+                        <span>@Model.TotalAmount.ToString("C0", new System.Globalization.CultureInfo("vi-VN"))</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center">
+                <a asp-action="Index" asp-controller="Home" class="btn btn-primary btn-lg">Tiếp tục mua sắm</a>
+            </div>
+        </div>
+    </div>
+</div>

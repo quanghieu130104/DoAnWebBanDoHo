@@ -1,0 +1,38 @@
+﻿@page
+@model ExternalLoginModel
+@{
+    // Đổi tiêu đề trang thành "Đăng ký"
+    ViewData["Title"] = "Đăng ký";
+    Layout = "~/Views/Shared/_Layout.cshtml"; // Đảm bảo sử dụng layout chính
+}
+
+<div class="main-content-wrapper">
+    <div class="login-card">
+
+        <h2>@ViewData["Title"]</h2>
+        <h3 id="external-login-title" class="text-muted mb-4">Liên kết tài khoản @Model.ProviderDisplayName của bạn.</h3>
+        <hr />
+
+        <p id="external-login-description" class="text-info text-start small mb-4">
+            Bạn đã xác thực thành công với tài khoản **@Model.ProviderDisplayName**.
+            Vui lòng nhập địa chỉ email cho trang web này bên dưới và nhấn nút **Đăng ký** để hoàn tất quá trình đăng nhập.
+        </p>
+
+        <form asp-page-handler="Confirmation" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-4" role="alert"></div>
+
+            <div class="form-floating mb-4">
+                <input asp-for="Input.Email" class="form-control" autocomplete="email" placeholder="Vui lòng nhập email của bạn." />
+                <label asp-for="Input.Email" class="form-label">Địa chỉ Email</label>
+                <span asp-validation-for="Input.Email" class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="btn btn-lg btn-custom-dark">HOÀN TẤT ĐĂNG KÝ</button>
+        </form>
+
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,31 @@
+﻿@page
+@model ErrorModel
+@{
+    ViewData["Title"] = "Lỗi";
+    Layout = "~/Views/Shared/_Layout.cshtml"; // Đảm bảo sử dụng layout chính
+}
+
+<div class="main-content-wrapper">
+    <div class="login-card">
+
+        <h1 class="text-danger mb-3">@ViewData["Title"]</h1>
+        <h2 class="text-danger fs-4 mb-4">Đã xảy ra lỗi trong quá trình xử lý yêu cầu của bạn.</h2>
+
+        @if (Model.ShowRequestId)
+        {
+            <p class="text-muted text-start">
+                <strong>Mã Yêu cầu (Request ID):</strong> <code>@Model.RequestId</code>
+            </p>
+        }
+
+        <hr />
+
+        <h3 class="text-start mt-4">Chế độ Phát triển (Development Mode)</h3>
+        <p class="text-muted text-start small">
+            Chuyển sang môi trường **Development** sẽ hiển thị thông tin chi tiết hơn về lỗi đã xảy ra.
+        </p>
+        <p class="text-muted text-start small">
+            **KHÔNG NÊN** bật môi trường **Development** trong các ứng dụng đã triển khai (deployed applications), vì điều này có thể dẫn đến việc hiển thị thông tin nhạy cảm từ các ngoại lệ cho người dùng cuối. Để gỡ lỗi cục bộ, môi trường phát triển có thể được kích hoạt bằng cách đặt biến môi trường **ASPNETCORE_ENVIRONMENT** thành **Development**, và khởi động lại ứng dụng.
+        </p>
+    </div>
+</div>

@@ -1,0 +1,43 @@
+﻿@page
+@model RegisterConfirmationModel
+@{
+    ViewData["Title"] = "Xác nhận Đăng ký";
+    Layout = "~/Views/Shared/_Layout.cshtml"; // Đảm bảo sử dụng layout chính
+}
+
+<div class="main-content-wrapper">
+    <div class="login-card">
+
+        <h2>@ViewData["Title"]</h2>
+        <hr />
+
+        @{
+            // Trường hợp 1: Đang ở chế độ phát triển hoặc chưa cấu hình dịch vụ gửi email thật
+            if (@Model.DisplayConfirmAccountLink)
+            {
+                <p class="text-danger mb-4 text-start">
+                    Ứng dụng này hiện chưa cấu hình dịch vụ gửi email thật. Vui lòng xem <a href="https://aka.ms/aspaccountconf" target="_blank">tài liệu này</a> để biết cách cấu hình.
+                    <br /><br />
+                    Thông thường, một email sẽ được gửi đi. Để xác nhận tài khoản ngay bây giờ, vui lòng:
+                    <a id="confirm-link" href="@Model.EmailConfirmationUrl" class="font-weight-bold text-success">
+                        Bấm vào đây để xác nhận tài khoản của bạn
+                    </a>
+                </p>
+            }
+            // Trường hợp 2: Đã cấu hình dịch vụ gửi email thật
+            else
+            {
+                <p class="text-success fs-5">
+                    Vui lòng **kiểm tra hộp thư email** của bạn để xác nhận tài khoản.
+                </p>
+            }
+        }
+
+        <div class="bottom-links mt-4">
+            <p class="text-muted">
+                Bạn có thể quay lại trang
+                <a asp-page="./Login" class="font-weight-bold">Đăng nhập</a>.
+            </p>
+        </div>
+    </div>
+</div>

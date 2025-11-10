@@ -1,0 +1,30 @@
+﻿@page
+@model DoAnWebBanDoHo.Areas.Identity.Pages.Account.LogoutModel
+@{
+    ViewData["Title"] = "Đăng xuất";
+    // Sử dụng layout chính để có header/footer
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="main-content-wrapper">
+    <div class="login-card">
+
+        <h2>@ViewData["Title"]</h2>
+        <hr />
+
+        <h4 class="text-muted mb-4">Bạn có chắc chắn muốn đăng xuất không?</h4>
+
+        <form id="logoutForm" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Page("/Index")" method="post">
+
+            <button type="submit" class="btn btn-lg btn-custom-dark w-100 mb-3">
+                XÁC NHẬN ĐĂNG XUẤT
+            </button>
+
+            <a href="@Url.Page("/Index")" class="btn btn-lg btn-outline-secondary w-100">
+                HỦY BỎ
+            </a>
+
+            <input name="__RequestVerificationToken" type="hidden" value="@Html.AntiForgeryToken()" />
+        </form>
+    </div>
+</div>

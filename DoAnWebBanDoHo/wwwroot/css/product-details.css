@@ -1,0 +1,203 @@
+﻿/* --- BỐ CỤC CHUNG --- */
+.product-details-page { /* Thêm class này để style cụ thể hơn */
+    margin-bottom: 50px; /* Thêm khoảng trống dưới cùng */
+}
+
+.product-brand {
+    color: #555;
+    font-weight: 600;
+    letter-spacing: 1px;
+    font-size: 0.9rem;
+    margin-bottom: 5px;
+}
+
+.product-title {
+    font-size: 2rem; /* Giảm kích thước một chút */
+    font-weight: 700;
+    color: #1a1a1a;
+    line-height: 1.3;
+    margin-bottom: 10px;
+}
+
+.product-meta {
+    font-size: 0.85rem; /* Giảm kích thước */
+    color: #666;
+    margin-bottom: 15px; /* Tăng khoảng cách */
+}
+
+    .product-meta a {
+        text-decoration: none;
+        color: #007bff;
+    }
+
+.product-review i {
+    font-size: 0.8rem;
+}
+
+/* --- HỘP GIÁ --- */
+.product-price-box {
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #eee;
+}
+
+.product-price-new {
+    font-size: 2.3rem; /* Giảm kích thước */
+    font-weight: 700;
+    color: #d70018; /* Màu đỏ */
+    display: block; /* Cho giá mới xuống dòng */
+    margin-bottom: 5px;
+}
+
+.product-price-old {
+    font-size: 1.3rem; /* Giảm kích thước */
+    color: #888;
+    text-decoration: line-through; /* Gạch ngang */
+    margin-right: 10px; /* Đổi từ left sang right */
+}
+
+.product-discount-badge {
+    background-color: #d70018;
+    color: white;
+    padding: 4px 8px;
+    font-size: 0.85rem; /* Giảm kích thước */
+    font-weight: bold;
+    border-radius: 4px;
+    /* margin-left: 10px; Xóa */
+    vertical-align: middle;
+}
+
+/* --- THUỘC TÍNH SẢN PHẨM --- */
+.product-attributes {
+    font-size: 0.95rem; /* Giảm kích thước */
+    color: #333;
+    margin-top: 25px; /* Tăng khoảng cách */
+}
+
+    .product-attributes li {
+        padding: 8px 0; /* Giảm padding */
+        border-bottom: 1px solid #f0f0f0;
+        display: flex;
+        align-items: center; /* Căn giữa theo chiều dọc */
+    }
+
+        .product-attributes li:last-child {
+            border-bottom: none;
+        }
+
+    .product-attributes strong {
+        min-width: 120px; /* Giảm chiều rộng */
+        width: 120px;
+        display: inline-block;
+        color: #555;
+        font-weight: 500; /* Giảm độ đậm */
+    }
+
+    .product-attributes span {
+        flex: 1;
+    }
+
+/* --- THÔNG TIN THÊM --- */
+.product-extra-info {
+    font-size: 0.9rem; /* Giảm kích thước */
+    margin-top: 20px;
+}
+
+    .product-extra-info p {
+        margin-bottom: 8px; /* Giảm khoảng cách */
+    }
+
+    .product-extra-info i {
+        color: #d70018;
+        margin-right: 8px;
+        width: 20px;
+        text-align: center;
+    }
+
+/* --- MÃ GIẢM GIÁ --- */
+.promo-codes {
+    margin-top: 20px;
+}
+
+    .promo-codes label {
+        font-size: 0.95rem;
+    }
+
+.promo-code {
+    border: 1px dashed #d70018;
+    background-color: #fff8f8;
+    color: #d70018;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 0.85rem; /* Giảm kích thước */
+    font-weight: 500;
+    cursor: pointer; /* Thêm con trỏ */
+    transition: background-color 0.2s ease;
+}
+
+    .promo-code:hover {
+        background-color: #ffeaea;
+    }
+
+
+/* --- GALLERY ẢNH (QUAN TRỌNG) --- */
+.main-image-container {
+    border: 1px solid #eee;
+    padding: 10px;
+    border-radius: 8px;
+    background-color: #fff; /* Nền trắng */
+    text-align: center; /* Căn giữa ảnh */
+}
+/* Đảm bảo ảnh chính không tràn viền */
+#main-product-image {
+    max-width: 100%;
+    height: auto;
+    border-radius: 4px; /* Bo góc nhẹ cho ảnh chính */
+}
+
+
+.thumbnail-container {
+    margin-top: 15px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.product-thumbnail {
+    width: 70px; /* Giảm kích thước thumbnail */
+    height: 70px;
+    object-fit: cover;
+    cursor: pointer;
+    border: 2px solid #ddd; /* Viền xám nhạt hơn */
+    border-radius: 5px;
+    opacity: 0.7;
+    transition: all 0.2s ease;
+    background-color: #fff; /* Nền trắng */
+}
+
+    .product-thumbnail:hover {
+        opacity: 1;
+        border-color: #aaa; /* Viền xám đậm hơn khi hover */
+    }
+
+    .product-thumbnail.active {
+        opacity: 1;
+        border-color: #007bff; /* Viền xanh cho ảnh active */
+        box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Thêm bóng mờ */
+    }
+
+
+/* --- MÔ TẢ (Cuối trang) --- */
+.product-description {
+    /* Đã dùng card bootstrap nên bỏ bớt style */
+}
+
+    .product-description h4 {
+        font-weight: 600;
+    }
+
+    .product-description .card-body {
+        line-height: 1.7; /* Tăng khoảng cách dòng */
+        color: #444;
+    }

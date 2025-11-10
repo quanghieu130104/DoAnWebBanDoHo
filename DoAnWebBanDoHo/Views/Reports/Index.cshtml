@@ -1,0 +1,132 @@
+﻿@model DoAnWebBanDoHo.Models.SalesStatisticsViewModel
+
+@{
+    ViewData["Title"] = "Báo Cáo Thống Kê";
+}
+
+<div class="container py-4">
+    <h1 class="display-4 mb-4 text-center">Báo Cáo Thống Kê</h1>
+    <hr />
+
+    <div class="row mb-5">
+        <div class="col-md-4 mb-4">
+            <div class="card bg-primary text-white shadow-lg rounded-lg h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-money-bill-wave fa-3x mb-3"></i>
+                    <h5 class="card-title">Tổng Doanh Thu</h5>
+                    <p class="card-text display-5 fw-bold">@Model.TotalOverallRevenue.ToString("C0", new System.Globalization.CultureInfo("vi-VN"))</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card bg-info text-white shadow-lg rounded-lg h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-shopping-bag fa-3x mb-3"></i>
+                    <h5 class="card-title">Tổng Số Đơn Hàng</h5>
+                    <p class="card-text display-5 fw-bold">@Model.TotalOrders</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card bg-success text-white shadow-lg rounded-lg h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-cubes fa-3x mb-3"></i>
+                    <h5 class="card-title">Tổng Số SP Đã Bán</h5>
+                    <p class="card-text display-5 fw-bold">@Model.TotalItemsSold</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-7 mb-4">
+            <div class="card shadow-sm border-0 rounded-lg">
+                <div class="card-header bg-dark text-white py-3">
+                    <h5 class="mb-0"><i class="fas fa-chart-line me-2"></i>Doanh Thu Theo Tháng (Năm @DateTime.Now.Year)</h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.MonthlyRevenue != null && Model.MonthlyRevenue.Any())
+                    {
+                        <ul class="list-group list-group-flush">
+                            @foreach (var entry in Model.MonthlyRevenue)
+                            {
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    Tháng @entry.Key:
+                                    <span class="badge bg-primary rounded-pill fw-bold">@entry.Value.ToString("C0", new System.Globalization.CultureInfo("vi-VN"))</span>
+                                </li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <p class="text-muted text-center">Chưa có dữ liệu doanh thu theo tháng.</p>
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="col-md-5 mb-4">
+            <div class="card shadow-sm border-0 rounded-lg">
+                <div class="card-header bg-dark text-white py-3">
+                    <h5 class="mb-0"><i class="fas fa-star me-2"></i>Sản Phẩm Bán Chạy Nhất (Top 5)</h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.TopSellingProducts != null && Model.TopSellingProducts.Any())
+                    {
+                        <ul class="list-group list-group-flush">
+                            @foreach (var productSale in Model.TopSellingProducts)
+                            {
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div class="d-flex align-items-center">
+                                        <img src="@(string.IsNullOrEmpty(productSale.ImageUrl) ? "https://placehold.co/40x30/e0e0e0/ffffff?text=No" : productSale.ImageUrl)"
+                                             alt="@productSale.ProductName" class="img-thumbnail me-2" style="width: 40px; height: 30px; object-fit: contain;">
+                                        <div>
+                                            <h6 class="my-0">@productSale.ProductName</h6>
+                                            <small class="text-muted">Đã bán: @productSale.TotalQuantitySold</small>
+                                        </div>
+                                    </div>
+                                    <span class="text-success fw-bold">@productSale.TotalRevenue.ToString("C0", new System.Globalization.CultureInfo("vi-VN"))</span>
+                                </li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <p class="text-muted text-center">Chưa có dữ liệu sản phẩm bán chạy.</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-12 mb-4">
+            <div class="card shadow-sm border-0 rounded-lg">
+                <div class="card-header bg-dark text-white py-3">
+                    <h5 class="mb-0"><i class="fas fa-chart-bar me-2"></i>Doanh Thu Theo Năm (5 Năm Gần Đây)</h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.YearlyRevenue != null && Model.YearlyRevenue.Any())
+                    {
+                        <ul class="list-group list-group-flush">
+                            @foreach (var entry in Model.YearlyRevenue)
+                            {
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    Năm @entry.Key:
+                                    <span class="badge bg-success rounded-pill fw-bold">@entry.Value.ToString("C0", new System.Globalization.CultureInfo("vi-VN"))</span>
+                                </li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <p class="text-muted text-center">Chưa có dữ liệu doanh thu theo năm.</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center mt-5">
+        <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">Quay lại Trang Chủ</a>
+    </div>
+</div>

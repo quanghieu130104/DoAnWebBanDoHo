@@ -1,0 +1,48 @@
+﻿@page
+@model LoginWith2faModel
+@{
+    ViewData["Title"] = "Xác thực hai yếu tố";
+    Layout = "~/Views/Shared/_Layout.cshtml"; // Đảm bảo sử dụng layout chính
+}
+
+<div class="main-content-wrapper">
+    <div class="login-card">
+
+        <h2>@ViewData["Title"]</h2>
+        <hr />
+
+        <p class="text-muted mb-4">Tài khoản của bạn được bảo vệ bằng ứng dụng xác thực. Vui lòng nhập mã xác thực của bạn bên dưới.</p>
+
+        <form method="post" asp-route-returnUrl="@Model.ReturnUrl">
+            <input asp-for="RememberMe" type="hidden" />
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-4" role="alert"></div>
+
+            <div class="form-floating mb-3">
+                <input asp-for="Input.TwoFactorCode" class="form-control" autocomplete="off" placeholder="Mã xác thực" />
+                <label asp-for="Input.TwoFactorCode" class="form-label">Mã xác thực</label>
+                <span asp-validation-for="Input.TwoFactorCode" class="text-danger"></span>
+            </div>
+
+            <div class="checkbox mb-3 text-start">
+                <label asp-for="Input.RememberMachine" class="form-label">
+                    <input asp-for="Input.RememberMachine" />
+                    Nhớ thiết bị này
+                </label>
+            </div>
+
+            <div>
+                <button type="submit" class="btn btn-lg btn-custom-dark w-100">ĐĂNG NHẬP</button>
+            </div>
+        </form>
+
+        <p class="mt-4 bottom-links">
+            Không thể truy cập vào thiết bị xác thực của bạn? Bạn có thể
+            <a id="recovery-code-login" asp-page="./LoginWithRecoveryCode" asp-route-returnUrl="@Model.ReturnUrl">đăng nhập bằng mã khôi phục</a>.
+        </p>
+
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

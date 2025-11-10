@@ -1,0 +1,63 @@
+﻿@model DoAnWebBanDoHo.Models.UserViewModel
+
+@{
+    ViewData["Title"] = "Xóa Người dùng: " + Model.Email;
+}
+
+<div class="container py-4">
+    <h1 class="mb-4 text-danger">Xóa Người Dùng</h1>
+    <h3 class="lead">Bạn có chắc chắn muốn xóa người dùng này không?</h3>
+    <hr />
+
+    <div class="card shadow-sm border-danger rounded-lg mb-4">
+        <div class="card-header bg-danger text-white">
+            <h5 class="mb-0">Thông Tin Người Dùng Sẽ Bị Xóa</h5>
+        </div>
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-3">Email:</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.Email)</dd>
+
+                <dt class="col-sm-3">Họ và tên:</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.FullName)</dd>
+
+                <dt class="col-sm-3">Địa chỉ:</dt>
+                <dd class="col-sm-9">@(string.IsNullOrEmpty(Model.Address) ? "Chưa có" : Model.Address)</dd>
+
+                <dt class="col-sm-3">Ngày sinh:</dt>
+                <dd class="col-sm-9">
+                    @(Model.DateOfBirth.HasValue && Model.DateOfBirth.Value != DateTime.MinValue ? Model.DateOfBirth.Value.ToString("dd/MM/yyyy") : "Chưa có")
+                </dd>
+
+                <dt class="col-sm-3">Vai trò:</dt>
+                <dd class="col-sm-9">
+                    @if (Model.Roles != null && Model.Roles.Any())
+                    {
+                        @foreach (var role in Model.Roles)
+                        {
+                            string badgeClass = role switch
+                            {
+                                "Admin" => "bg-danger",
+                                "User" => "bg-primary",
+                                _ => "bg-secondary"
+                            };
+                            <span class="badge @badgeClass me-1">@role</span>
+                        }
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary">Không có vai trò</span>
+                    }
+                </dd>
+            </dl>
+        </div>
+    </div>
+
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="Id" />
+        <div class="mt-4">
+            <input type="submit" value="Xác Nhận Xóa" class="btn btn-danger me-2" />
+            <a asp-action="Index" class="btn btn-secondary">Hủy bỏ</a>
+        </div>
+    </form>
+</div>

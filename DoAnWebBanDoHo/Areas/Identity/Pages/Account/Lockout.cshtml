@@ -1,0 +1,31 @@
+﻿@page
+@model LockoutModel
+@{
+    ViewData["Title"] = "Tài khoản bị Khóa";
+    Layout = "~/Views/Shared/_Layout.cshtml"; // Đảm bảo sử dụng layout chính
+}
+
+<div class="main-content-wrapper">
+    <div class="login-card">
+
+        <header>
+            <h1 class="text-danger mb-4">@ViewData["Title"]</h1>
+
+            <p class="text-danger fs-5">
+                Rất tiếc, tài khoản này đã bị khóa do nhập sai mật khẩu quá nhiều lần.
+            </p>
+            <p class="text-danger fs-5">
+                Vui lòng **thử lại sau một khoảng thời gian** hoặc sử dụng liên kết "Quên Mật khẩu" bên dưới.
+            </p>
+        </header>
+
+        <div class="bottom-links mt-4">
+            <p class="text-muted">
+                <a asp-page="./ForgotPassword" class="font-weight-bold">Quên mật khẩu?</a>
+            </p>
+            <p class="text-muted">
+                <a asp-page="./Login" class="font-weight-bold">Quay lại Đăng nhập</a>
+            </p>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,55 @@
+﻿@page
+@model ShowRecoveryCodesModel
+@{
+    ViewData["Title"] = "Mã Khôi phục";
+    ViewData["ActivePage"] = ManageNavPages.TwoFactorAuthentication; // Đảm bảo sử dụng ManageNavPages
+    Layout = "~/Views/Shared/_Layout.cshtml"; // Áp dụng layout chính để dùng login-card
+}
+
+<div class="main-content-wrapper">
+    <div class="login-card p-4">
+        @* Sử dụng login-card để định dạng *@
+
+        <h3 class="text-center mb-4">@ViewData["Title"]</h3>
+        <partial name="_StatusMessage" for="StatusMessage" />
+
+        <div class="alert alert-warning" role="alert">
+            <h4 class="alert-heading small">
+                <span class="fas fa-exclamation-triangle"></span>
+                <strong>LƯU Ý QUAN TRỌNG:</strong>
+            </h4>
+            <p class="small mb-1">
+                <strong>Đặt các mã này ở một nơi an toàn.</strong>
+            </p>
+            <p class="small mb-0">
+                Nếu bạn mất thiết bị xác thực và không có các mã khôi phục này, bạn **sẽ mất quyền truy cập** vào tài khoản của mình.
+            </p>
+        </div>
+
+        <div class="row mt-4 justify-content-center">
+            <div class="col-md-12">
+                <p class="text-muted text-start mb-3">
+                    Dưới đây là các mã khôi phục của bạn:
+                </p>
+
+                <div class="recovery-codes-grid border p-3 rounded bg-light text-center">
+                    @* Vòng lặp hiển thị Mã Khôi phục theo cặp *@
+                    @for (var row = 0; row < Model.RecoveryCodes.Length; row += 2)
+                    {
+                        <div class="d-flex justify-content-between mb-2">
+                            <code class="p-2 bg-white border rounded flex-fill mx-1">@Model.RecoveryCodes[row]</code>
+                            @if (row + 1 < Model.RecoveryCodes.Length)
+                            {
+                                <code class="p-2 bg-white border rounded flex-fill mx-1">@Model.RecoveryCodes[row + 1]</code>
+                            }
+                        </div>
+                    }
+                </div>
+
+                <p class="text-muted small mt-3 text-start">
+                    Hãy in hoặc sao chép và lưu trữ chúng ở nơi an toàn.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>

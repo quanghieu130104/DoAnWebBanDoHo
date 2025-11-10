@@ -1,0 +1,39 @@
+﻿@page
+@model ResetAuthenticatorModel
+@{
+    ViewData["Title"] = "Đặt lại khóa xác thực";
+    ViewData["ActivePage"] = ManageNavPages.TwoFactorAuthentication;
+    Layout = "~/Views/Shared/_Layout.cshtml"; // Áp dụng layout chính để dùng login-card
+}
+
+<div class="main-content-wrapper">
+    <div class="login-card p-4">
+        @* Sử dụng login-card để định dạng *@
+
+        <h3 class="text-center mb-4">@ViewData["Title"]</h3>
+        <partial name="_StatusMessage" for="StatusMessage" />
+
+        <div class="alert alert-warning" role="alert">
+            <h4 class="alert-heading small">
+                <span class="fas fa-exclamation-triangle"></span>
+                <strong>CẢNH BÁO QUAN TRỌNG:</strong>
+            </h4>
+            <p class="small mb-1">
+                <strong>Nếu bạn đặt lại khóa xác thực, ứng dụng xác thực của bạn sẽ không hoạt động cho đến khi bạn cấu hình lại.</strong>
+            </p>
+            <p class="small mb-0">
+                Quá trình này sẽ vô hiệu hóa Xác thực hai yếu tố (2FA) cho đến khi bạn xác minh ứng dụng xác thực mới của mình.
+                Nếu bạn không hoàn thành cấu hình ứng dụng xác thực, bạn có thể bị mất quyền truy cập vào tài khoản của mình.
+            </p>
+        </div>
+
+        <div class="mt-4">
+            <form id="reset-authenticator-form" method="post">
+                <button id="reset-authenticator-button" class="w-100 btn btn-lg btn-danger" type="submit">
+                    ĐẶT LẠI KHÓA XÁC THỰC
+                </button>
+            </form>
+        </div>
+
+    </div>
+</div>

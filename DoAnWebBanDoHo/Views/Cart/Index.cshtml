@@ -1,0 +1,189 @@
+﻿@model IEnumerable<DoAnWebBanDoHo.Models.CartItem>
+@using DoAnWebBanDoHo.Models 
+
+@{
+    ViewData["Title"] = "Giỏ Hàng Của Bạn";
+    var cartSubtotal = (decimal)ViewBag.CartSubtotal; // Tổng tiền trước giảm giá
+    var cartTotalPrice = (decimal)ViewBag.CartTotalPrice; // Tổng tiền sau giảm giá
+    var appliedDiscount = ViewBag.AppliedDiscount as Discount; // Mã giảm giá đã áp dụng
+}
+
+<div class="container py-5">
+    <h1 class="display-4 text-center mb-5">Giỏ Hàng Của Bạn</h1>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (Model != null && Model.Any())
+    {
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover shadow-sm">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Sản Phẩm</th>
+                        <th>Ảnh</th>
+                        <th>Giá</th>
+                        <th>Số Lượng</th>
+                        <th>Tổng Cộng</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td class="align-middle">
+                                <a asp-controller="Home" asp-action="Details" asp-route-id="@item.ProductId" class="text-decoration-none text-primary fw-bold">
+                                    @Html.DisplayFor(modelItem => item.ProductName)
+                                </a>
+                            </td>
+                            <td class="align-middle text-center" style="width: 120px;">
+                                <img src="@(string.IsNullOrEmpty(item.ImageUrl) ? "https://placehold.co/80x60/e0e0e0/ffffff?text=No+Image" : item.ImageUrl)" alt="@item.ProductName" style="max-width: 80px; height: auto; border-radius: 5px;">
+                            </td>
+                            <td class="align-middle">
+                                @if (item.DiscountedPrice.HasValue && item.DiscountedPrice < item.Price)
+                                {
+                                    <span class="text-muted text-decoration-line-through">@item.Price.ToString("C0", new System.Globalization.CultureInfo("vi-VN"))</span><br />
+                                    <span class="text-success fw-bold">@item.DiscountedPrice.Value.ToString("C0", new System.Globalization.CultureInfo("vi-VN"))</span>
+                                }
+                                else
+                                {
+                                    <span class="fw-bold">@item.Price.ToString("C0", new System.Globalization.CultureInfo("vi-VN"))</span>
+                                }
+                            </td>
+                            <td class="align-middle" style="width: 150px;">
+                                <form asp-controller="Cart" asp-action="UpdateQuantity" method="post" class="d-flex align-items-center">
+                                    <input type="hidden" name="productId" value="@item.ProductId" />
+                                    <input type="number" name="quantity" value="@item.Quantity" class="form-control form-control-sm text-center" style="width: 70px;" min="1" onchange="this.form.submit()" />
+                                </form>
+                            </td>
+                            <td class="align-middle fw-bold">
+                                @item.TotalPrice.ToString("C0", new System.Globalization.CultureInfo("vi-VN"))
+                            </td>
+                            <td class="align-middle text-center">
+                                <form asp-controller="Cart" asp-action="RemoveItem" method="post" onsubmit="return confirm('Bạn có chắc muốn xóa sản phẩm này khỏi giỏ hàng?');">
+                                    <input type="hidden" name="productId" value="@item.ProductId" />
+                                    <button type="submit" class="btn btn-danger btn-sm">Xóa</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <div class="card shadow-sm border-0 rounded-lg">
+                    <div class="card-header bg-secondary text-white">
+                        <h5 class="mb-0">Mã Giảm Giá</h5>
+                    </div>
+                    <div class="card-body">
+                        @if (appliedDiscount != null)
+                        {
+                            <div class="alert alert-success d-flex justify-content-between align-items-center">
+                                Mã "<span class="fw-bold">@appliedDiscount.Code</span>" đã được áp dụng!
+                                <form asp-controller="Cart" asp-action="RemoveDiscount" method="post">
+                                    <button type="submit" class="btn btn-sm btn-outline-success">Xóa mã</button>
+                                </form>
+                            </div>
+                        }
+                        else
+                        {
+                            <form asp-controller="Cart" asp-action="ApplyDiscount" method="post" class="input-group">
+                                <input type="text" name="discountCode" class="form-control" placeholder="Nhập mã giảm giá" />
+                                <button type="submit" class="btn btn-primary">Áp dụng</button>
+                            </form>
+                        }
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card shadow-sm border-0 rounded-lg">
+                    <div class="card-body">
+                        <h4 class="card-title text-end">
+                            Tổng Cộng (chưa KM): <span class="text-muted text-decoration-line-through">@cartSubtotal.ToString("C0", new System.Globalization.CultureInfo("vi-VN"))</span>
+                        </h4>
+                        <h4 class="card-title text-end">
+                            Thanh Toán: <span class="text-primary fw-bold">@cartTotalPrice.ToString("C0", new System.Globalization.CultureInfo("vi-VN"))</span>
+                        </h4>
+                        <hr />
+                        <div class="d-grid gap-2">
+                            <form asp-controller="Cart" asp-action="ClearCart" method="post" onsubmit="return confirm('Bạn có chắc muốn xóa tất cả sản phẩm khỏi giỏ hàng?');">
+                                <button type="submit" class="btn btn-warning w-100 mb-2">Xóa toàn bộ giỏ hàng</button>
+                            </form>
+                            <a asp-action="Index" asp-controller="Home" class="btn btn-outline-secondary w-100">Tiếp tục mua sắm</a>
+                            <a asp-controller="Checkout" asp-action="Index" class="btn btn-success w-100">Tiến hành thanh toán</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="empty-cart-section text-center py-5">
+            <div class="empty-cart-icon-wrapper mx-auto mb-4">
+                <img src="~/images/icons/empty_cart_icon.png"
+                     alt="Giỏ hàng trống">
+            </div>
+
+            <h2 class="fw-bold mb-3" style="color: #333;">Giỏ hàng của bạn đang trống!</h2>
+            <p class="text-muted" style="font-size: 1.1rem; line-height: 1.6; max-width: 600px; margin: 0 auto 30px auto;">
+                Thật tiếc! Chúng tôi biết bạn đang muốn mua món đồ gì đó.
+                Nhưng trước tiên bạn cần thêm món đồ đó vào giỏ hàng của mình.
+                Nhấn vào đây để tiếp tục mua sắm.
+            </p>
+
+            <a asp-controller="Home" asp-action="Index" class="btn btn-primary mt-3 rounded-pill px-5 py-3 fw-bold btn-lg">
+                Tiếp tục mua sắm
+            </a>
+        </div>
+
+        <hr class="my-5">
+
+        <div class="row text-center g-4 my-5">
+            <h3 class="fw-bold mb-4" style="color: #333;">An tâm khi mua sắm tại HTH Watches</h3>
+            <div class="col-md-3">
+                <div class="feature-item p-3">
+                    <img src="~/images/icons/icon-shipping.png" alt="Miễn phí vận chuyển" style="height: 50px; margin-bottom: 15px;">
+                    <h5 class="fw-semibold">Miễn phí vận chuyển</h5>
+                    <p class="text-muted small">Miễn phí vận chuyển các đơn hàng nội thành Hà Nội và TP. Hồ Chí Minh.</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="feature-item p-3">
+                    <img src="~/images/icons/icon-return.png" alt="Đổi trả đơn giản" style="height: 50px; margin-bottom: 15px;">
+                    <h5 class="fw-semibold">Đổi trả đơn giản</h5>
+                    <p class="text-muted small">Đổi trả và hoàn tiền trong vòng 5 ngày. Với bất kỳ sản phẩm lỗi nào.</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="feature-item p-3">
+                    <img src="~/images/icons/icon-authentic.png" alt="Sản phẩm chính hãng" style="height: 50px; margin-bottom: 15px;">
+                    <h5 class="fw-semibold">Sản phẩm chính hãng</h5>
+                    <p class="text-muted small">Bảo đảm sản phẩm chính hãng 100%. Hoàn tiền 150% nếu phát hiện hàng giả.</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="feature-item p-3">
+                    <img src="~/images/icons/icon-ssl.png" alt="Bảo mật thông tin" style="height: 50px; margin-bottom: 15px;">
+                    <h5 class="fw-semibold">Bảo mật thông tin</h5>
+                    <p class="text-muted small">100% thông tin cá nhân và giao dịch của bạn được bảo vệ an toàn.</p>
+                </div>
+            </div>
+        </div>
+    }
+</div>

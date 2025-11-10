@@ -1,0 +1,40 @@
+﻿@page
+@model LoginWithRecoveryCodeModel
+@{
+    ViewData["Title"] = "Xác minh Mã Khôi phục";
+    Layout = "~/Views/Shared/_Layout.cshtml"; // Đảm bảo sử dụng layout chính
+}
+
+<div class="main-content-wrapper">
+    <div class="login-card">
+
+        <h2>@ViewData["Title"]</h2>
+        <hr />
+
+        <p class="text-muted mb-4 text-start">
+            Bạn đã chọn đăng nhập bằng mã khôi phục. Phiên đăng nhập này sẽ không được ghi nhớ trừ khi bạn cung cấp
+            mã từ ứng dụng xác thực trong lần đăng nhập tới, hoặc bạn vô hiệu hóa xác thực 2 yếu tố (2FA) và đăng nhập lại.
+        </p>
+
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-4" role="alert"></div>
+
+            <div class="form-floating mb-4">
+                <input asp-for="Input.RecoveryCode" class="form-control" autocomplete="off" placeholder="Mã khôi phục" />
+                <label asp-for="Input.RecoveryCode" class="form-label">Mã Khôi phục</label>
+                <span asp-validation-for="Input.RecoveryCode" class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="btn btn-lg btn-custom-dark w-100">ĐĂNG NHẬP</button>
+        </form>
+
+        <p class="mt-4 bottom-links">
+            <a asp-page="./Login">Quay lại trang Đăng nhập</a>
+        </p>
+
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

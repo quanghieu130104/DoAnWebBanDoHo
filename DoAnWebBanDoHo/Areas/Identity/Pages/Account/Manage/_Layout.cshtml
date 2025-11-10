@@ -1,0 +1,38 @@
+﻿@{
+    // Logic xác định Layout cha (nếu có)
+    if (ViewData.TryGetValue("ParentLayout", out var parentLayout) && parentLayout != null)
+    {
+        Layout = parentLayout.ToString();
+    }
+    else
+    {
+        // Sử dụng Layout chung của bạn nếu không có Layout cha được định nghĩa
+        // THAY THẾ bằng đường dẫn Layout chính của bạn:
+        Layout = "~/Views/Shared/_Layout.cshtml"; 
+    }
+}
+
+<div class="main-content-wrapper">
+    <div class="container py-4"> @* Sử dụng container để giới hạn chiều rộng *@
+    
+        <h1 class="text-start mb-2">Quản lý Tài khoản</h1>
+        <h4 class="text-start text-muted mb-4">Thay đổi cài đặt tài khoản của bạn</h4>
+        <hr />
+
+        <div class="row">
+            <div class="col-md-3">
+                <partial name="_ManageNav" />
+            </div>
+            
+            <div class="col-md-9">
+                <div class="manage-content-area"> 
+                    @RenderBody()
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @RenderSection("Scripts", required: false)
+}

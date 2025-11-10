@@ -1,0 +1,78 @@
+﻿@model DoAnWebBanDoHo.Models.Discount
+
+@{
+    ViewData["Title"] = "Tạo Mã Giảm Giá Mới";
+}
+
+<div class="container py-4">
+    <h1 class="mb-4">Tạo Mã Giảm Giá Mới</h1>
+    <hr />
+
+    <div class="row">
+        <div class="col-md-6">
+            <form asp-action="Create">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="form-group mb-3">
+                    <label asp-for="Code" class="control-label"></label>
+                    <input asp-for="Code" class="form-control" />
+                    <span asp-validation-for="Code" class="text-danger"></span>
+                </div>
+                <div class="form-group mb-3">
+                    <label asp-for="DiscountType" class="control-label"></label>
+                    <select asp-for="DiscountType" class="form-control">
+                        <option value="Percentage">Phần trăm (%)</option>
+                        <option value="FixedAmount">Số tiền cố định</option>
+                    </select>
+                    <span asp-validation-for="DiscountType" class="text-danger"></span>
+                </div>
+                <div class="form-group mb-3">
+                    <label asp-for="DiscountValue" class="control-label"></label>
+                    <input asp-for="DiscountValue" class="form-control" type="number" step="0.01" />
+                    <span asp-validation-for="DiscountValue" class="text-danger"></span>
+                </div>
+                <div class="form-group mb-3">
+                    <label asp-for="MinimumOrderAmount" class="control-label"></label>
+                    <input asp-for="MinimumOrderAmount" class="form-control" type="number" step="0.01" />
+                    <span asp-validation-for="MinimumOrderAmount" class="text-danger"></span>
+                </div>
+                <div class="form-group mb-3">
+                    <label asp-for="StartDate" class="control-label"></label>
+                    <input asp-for="StartDate" class="form-control" type="date" value="@DateTime.Today.ToString("yyyy-MM-dd")" />
+                    <span asp-validation-for="StartDate" class="text-danger"></span>
+                </div>
+                <div class="form-group mb-3">
+                    <label asp-for="EndDate" class="control-label"></label>
+                    <input asp-for="EndDate" class="form-control" type="date" />
+                    <span asp-validation-for="EndDate" class="text-danger"></span>
+                </div>
+                <div class="form-group form-check mb-3">
+                    <input class="form-check-input" asp-for="IsActive" />
+                    <label class="form-check-label" asp-for="IsActive"></label>
+                </div>
+                <div class="form-group mb-3">
+                    <label asp-for="UsageLimit" class="control-label"></label>
+                    <input asp-for="UsageLimit" class="form-control" type="number" />
+                    <span asp-validation-for="UsageLimit" class="text-danger"></span>
+                </div>
+                <div class="form-group mb-3">
+                    <label asp-for="AppliesTo" class="control-label"></label>
+                    <select asp-for="AppliesTo" class="form-control">
+                        <option value="Order">Đơn Hàng</option>
+                        <!-- <option value="Product">Sản Phẩm (chức năng nâng cao hơn)</option> -->
+                    </select>
+                    <span asp-validation-for="AppliesTo" class="text-danger"></span>
+                </div>
+                <div class="form-group mt-3">
+                    <input type="submit" value="Tạo Mới" class="btn btn-primary" />
+                    <a asp-action="Index" class="btn btn-secondary">Quay Lại Danh Sách</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

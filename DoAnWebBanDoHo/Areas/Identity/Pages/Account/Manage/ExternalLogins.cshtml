@@ -1,0 +1,89 @@
+﻿@page
+@model EnableAuthenticatorModel
+@{
+    ViewData["Title"] = "Cấu hình ứng dụng xác thực";
+    ViewData["ActivePage"] = ManageNavPages.TwoFactorAuthentication;
+    // Sử dụng layout chính để có thể dùng login-card
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="main-content-wrapper">
+    <div class="login-card p-4 text-start">
+        @* Dùng login-card, căn lề trái cho nội dung hướng dẫn *@
+
+        <h3 class="text-center mb-4">@ViewData["Title"]</h3>
+        <partial name="_StatusMessage" for="StatusMessage" />
+
+        <div>
+            <p class="text-muted">Để sử dụng ứng dụng xác thực, vui lòng thực hiện theo các bước sau:</p>
+            <ol class="list-unstyled">
+                <li>
+                    <p>
+                        **Tải ứng dụng:** Tải về một ứng dụng xác thực hai yếu tố (2FA) như **Microsoft Authenticator** (cho
+                        <a href="https://go.microsoft.com/fwlink/?Linkid=825072" target="_blank">Android</a> và
+                        <a href="https://go.microsoft.com/fwlink/?Linkid=825073" target="_blank">iOS</a>) hoặc
+                        **Google Authenticator** (cho
+                        <a href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2&amp;hl=en" target="_blank">Android</a> và
+                        <a href="https://itunes.apple.com/us/app/google-authenticator/id388497605?mt=8" target="_blank">iOS</a>).
+                    </p>
+                </li>
+                <li class="mt-4">
+                    <p>
+                        **Quét mã hoặc nhập khóa:** Quét Mã QR (nếu có) hoặc nhập khóa sau:
+                        <kbd>@Model.SharedKey</kbd> vào ứng dụng xác thực của bạn. (Khoảng trắng và chữ hoa/chữ thường không quan trọng).
+                    </p>
+                    <div class="alert alert-info small">Tìm hiểu cách <a href="https://go.microsoft.com/fwlink/?Linkid=852423" target="_blank">kích hoạt tạo Mã QR</a>.</div>
+
+                    <div id="qrCode" class="mb-3 text-center border p-3 rounded bg-white">
+                        <p class="text-muted small">Đang tạo Mã QR...</p>
+                    </div>
+                    <div id="qrCodeData" data-url="@Model.AuthenticatorUri" style="display:none;"></div>
+                </li>
+                <li class="mt-4">
+                    <p>
+                        **Xác minh:** Sau khi bạn đã quét Mã QR hoặc nhập khóa, ứng dụng xác thực sẽ cung cấp cho bạn một mã duy nhất.
+                        Vui lòng nhập mã đó vào hộp xác nhận bên dưới.
+                    </p>
+                    <div class="row justify-content-center">
+                        <div class="col-md-12">
+                            <form id="send-code" method="post">
+                                <div class="form-floating mb-3">
+                                    <input asp-for="Input.Code" class="form-control" autocomplete="off" placeholder="Mã xác minh" />
+                                    <label asp-for="Input.Code" class="control-label form-label">Mã Xác minh</label>
+                                    <span asp-validation-for="Input.Code" class="text-danger"></span>
+                                </div>
+                                <button type="submit" class="w-100 btn btn-lg btn-custom-dark">XÁC MINH</button>
+                                <div asp-validation-summary="ModelOnly" class="text-danger mt-3" role="alert"></div>
+                            </form>
+                        </div>
+                    </div>
+                </li>
+            </ol>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script src="~/lib/qrcode/qrcode.js"></script>
+    <script type="text/javascript">
+        window.addEventListener('DOMContentLoaded', function () {
+            var authenticatorUri = document.getElementById('qrCodeData').getAttribute('data-url');
+            var qrCodeElement = document.getElementById("qrCode");
+
+            if (authenticatorUri && qrCodeElement) {
+                qrCodeElement.innerHTML = ''; // Xóa nội dung "Đang tạo Mã QR..."
+
+                new QRCode(qrCodeElement, {
+                    text: authenticatorUri,
+                    width: 150,
+                    height: 150,
+                    colorDark: "#000000",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+            }
+        });
+    </script>
+}

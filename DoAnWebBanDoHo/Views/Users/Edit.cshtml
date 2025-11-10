@@ -1,0 +1,101 @@
+﻿@model DoAnWebBanDoHo.Models.EditUserViewModel
+
+@{
+    ViewData["Title"] = "Chỉnh sửa Người dùng: " + Model.Email;
+}
+
+<div class="container py-4">
+    <h1 class="mb-4">Chỉnh Sửa Người Dùng: <span class="text-primary">@Model.Email</span></h1>
+    <hr />
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0 rounded-lg mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Thông Tin Người Dùng</h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Edit">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <input type="hidden" asp-for="Id" />
+
+                        <div class="mb-3">
+                            <label asp-for="Email" class="form-label"></label>
+                            <input asp-for="Email" class="form-control" readonly />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="FullName" class="form-label"></label>
+                            <input asp-for="FullName" class="form-control" />
+                            <span asp-validation-for="FullName" class="text-danger"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="Address" class="form-label"></label>
+                            <textarea asp-for="Address" class="form-control" rows="3"></textarea>
+                            <span asp-validation-for="Address" class="text-danger"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="DateOfBirth" class="form-label"></label>
+                            <!-- <<<<<< ĐÃ SỬA: Sử dụng .HasValue và .Value một cách chính xác >>>>>> -->
+                            <input asp-for="DateOfBirth" class="form-control" type="date" value="@(Model.DateOfBirth.HasValue? Model.DateOfBirth.Value.ToString("yyyy-MM-dd") : "")" />
+                            <span asp-validation-for="DateOfBirth" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Vai trò hiện tại:</label>
+                            <div>
+                                @if (Model.UserRoles != null && Model.UserRoles.Any())
+                                {
+                                    @foreach (var role in Model.UserRoles)
+                                    {
+                                        string badgeClass = role switch
+                                        {
+                                            "Admin" => "bg-danger",
+                                            "User" => "bg-primary",
+                                            _ => "bg-secondary"
+                                        };
+                                        <span class="badge @badgeClass me-1">@role</span>
+                                    }
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">Không có vai trò</span>
+                                }
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Cập nhật vai trò:</label>
+                            @if (Model.AllRoles != null && Model.AllRoles.Any())
+                            {
+                                @foreach (var role in Model.AllRoles)
+                                {
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox"
+                                               name="SelectedRoles" value="@role"
+                                               id="@("role_" + role)"
+                                               @(Model.UserRoles.Contains(role) ? "checked" : "") />
+                                        <label class="form-check-label" for="@("role_" + role)">
+                                            @role
+                                        </label>
+                                    </div>
+                                }
+                            }
+                        </div>
+
+                        <div class="form-group mt-4">
+                            <button type="submit" class="btn btn-primary me-2">Lưu Thay Đổi</button>
+                            <a asp-action="Index" class="btn btn-secondary">Quay Lại Danh Sách</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

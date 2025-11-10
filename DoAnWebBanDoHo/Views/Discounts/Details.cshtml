@@ -1,0 +1,246 @@
+﻿@model DoAnWebBanDoHo.Models.Discount
+
+@{
+    ViewData["Title"] = "Chi tiết mã giảm giá: " + Model.Code; // Tiêu đề trang
+}
+
+<!-- Link đến Font Awesome (nếu _Layout chưa có hoặc để chắc chắn) -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+
+<style>
+    /* CSS tùy chỉnh cho trang này */
+    body {
+        background-color: #f7f7f9;
+    }
+    /* Nền xám nhạt cho cả trang */
+    .discount-details-container {
+        max-width: 800px;
+        margin: 3rem auto;
+        padding: 1rem;
+    }
+    /* Tăng margin top/bottom */
+    .promo-header {
+        color: #6a1b9a;
+        font-weight: 600;
+    }
+    /* Màu tím đậm hơn */
+    .code-box {
+        border: 2px dashed #d1c4e9; /* Viền tím nhạt */
+        padding: 2.5rem; /* Tăng padding */
+        background-color: #ffffff;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.07); /* Thêm bóng mờ nhẹ */
+    }
+
+        .code-box h3 {
+            color: #4a148c; /* Màu tím rất đậm cho mã code */
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+    .info-card {
+        background-color: #ffffff;
+        padding: 1.5rem;
+        border-radius: 12px; /* Bo góc nhiều hơn */
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.07);
+        height: 100%; /* Đảm bảo các card cao bằng nhau */
+    }
+
+        .info-card h5 {
+            color: #4a148c; /* Màu tím đậm cho tiêu đề card */
+            font-weight: 600;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+            .info-card h5 i {
+                color: #7e57c2; /* Màu tím nhạt hơn cho icon */
+            }
+
+    .usage-steps .step-number {
+        background-color: #7e57c2; /* Màu tím */
+        color: white;
+        width: 28px; /* To hơn */
+        height: 28px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        margin-right: 12px;
+        flex-shrink: 0; /* Không co lại */
+    }
+
+    .usage-steps span {
+        line-height: 1.6; /* Tăng khoảng cách dòng */
+    }
+
+    .table td {
+        padding-top: 0.5rem; /* Giảm padding bảng */
+        padding-bottom: 0.5rem;
+        vertical-align: middle;
+    }
+
+    .btn-copy-code { /* Style riêng cho nút copy */
+        background-color: #5e35b1; /* Màu tím */
+        border-color: #5e35b1;
+        color: white;
+    }
+
+        .btn-copy-code:hover {
+            background-color: #4a148c;
+            border-color: #4a148c;
+            color: white;
+        }
+
+    .btn-copied { /* Style khi đã copy */
+        background-color: #4caf50; /* Màu xanh lá */
+        border-color: #4caf50;
+        cursor: default;
+    }
+</style>
+
+<div class="container discount-details-container">
+    <!-- Header -->
+    <div class="text-center mb-5">
+        @* Tăng margin bottom *@
+        <h2 class="fw-bold">Chi tiết mã giảm giá</h2>
+        <p class="promo-header fs-5 mt-2">Sử dụng mã @Model.Code để nhận ngay ưu đãi!</p>
+    </div>
+
+    <!-- Khung Mã Giảm Giá -->
+    <div class="code-box text-center rounded mb-5">
+        @* Tăng margin bottom *@
+        <h3 class="display-6">@Model.Code</h3>
+        <p class="text-muted mt-3 mb-4">Sao chép mã này và áp dụng khi đặt hàng.<br>Lượt sử dụng có hạn, nhanh tay kẻo lỡ bạn nhé!</p>
+        <button id="copyBtn" class="btn btn-copy-code btn-lg mt-2" onclick="copyDiscountCode('@Model.Code', this)">
+            @* Thêm btn-lg và id *@
+            <i class="far fa-copy me-2"></i>Lấy mã
+        </button>
+    </div>
+
+    <div class="row g-4">
+        <!-- Điều kiện -->
+        <div class="col-lg-6">
+            <div class="info-card">
+                <h5 class="mb-3"><i class="fas fa-list-ul me-2"></i>Điều kiện</h5>
+                <table class="table table-borderless table-sm">
+                    <tbody>
+                        <tr>
+                            <td class="text-muted">Hạn sử dụng:</td>
+                            <td class="text-end fw-bold">@Model.EndDate.ToString("dd/MM/yyyy HH:mm")</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Hình thức:</td>
+                            <td class="text-end fw-bold">
+                                @if (Model.DiscountType == "Percentage")
+                                {
+                                    <span>Giảm theo %</span>
+                                }
+                                else
+                                {
+
+                                    <span>Giảm tiền trực tiếp</span>
+                                }
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Giảm:</td>
+                            <td class="text-end fw-bold">
+                                @if (Model.DiscountType == "Percentage")
+                                {
+                                    <span>@Model.DiscountValue%</span>
+                                }
+                                else
+                                {
+
+                                    <span>@Model.DiscountValue.ToString("N0")đ</span>
+                                }
+                            </td>
+                        </tr>
+                        @if (Model.MinimumOrderAmount.HasValue && Model.MinimumOrderAmount > 0)
+                        {
+                            <tr>
+                                <td class="text-muted">Đơn tối thiểu:</td>
+                                <td class="text-end fw-bold">@Model.MinimumOrderAmount.Value.ToString("N0")đ</td>
+                            </tr>
+                        }
+                        <tr>
+                            <td class="text-muted">Nền tảng:</td>
+                            <td class="text-end fw-bold">Web & App (iOS, Android)</td> @* Giả định *@
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Thanh toán:</td>
+                            <td class="text-end fw-bold">Tất cả</td> @* Giả định *@
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Cách sử dụng -->
+        <div class="col-lg-6">
+            <div class="info-card">
+                <h5 class="mb-3"><i class="fas fa-question-circle me-2"></i>Cách sử dụng</h5>
+                <ul class="list-unstyled usage-steps">
+                    <li class="d-flex mb-3 align-items-center"><span class="step-number">1</span><span>Thêm sản phẩm bạn cần mua vào giỏ hàng.</span></li>
+                    <li class="d-flex mb-3 align-items-center"><span class="step-number">2</span><span>Tiến hành nhập thông tin đặt hàng và tìm phần "Chọn mã giảm giá".</span></li>
+                    <li class="d-flex mb-3 align-items-center"><span class="step-number">3</span><span>Nhập mã <strong>@Model.Code</strong> và nhấn nút "Áp dụng".</span></li>
+                    <li class="d-flex align-items-center"><span class="step-number">4</span><span>Số tiền giảm giá sẽ được áp dụng vào đơn hàng của bạn.</span></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chú ý -->
+    <div class="col-12 mt-4">
+        <div class="info-card">
+            <h5 class="mb-3"><i class="fas fa-info-circle me-2"></i>Chú ý</h5>
+            <ul class="text-muted mb-0 ps-3">
+                @* Dùng list cho đẹp hơn *@
+                <li>Mỗi số điện thoại đặt hàng chỉ được sử dụng một lần duy nhất.</li>
+                <li>Mã giảm giá không áp dụng đồng thời với các chương trình khuyến mãi khác (nếu có).</li> @* Ví dụ chú ý khác *@
+            </ul>
+        </div>
+    </div>
+
+    <!-- Nút quay lại -->
+    <div class="text-center mt-5">
+        @* Tăng margin top *@
+        <a asp-action="Index" asp-controller="Home" class="btn btn-secondary px-4">
+            @* Link về trang chủ *@
+            <i class="fas fa-arrow-left me-2"></i>Quay lại trang chủ
+        </a>
+        @if (User.IsInRole("Admin")) // Chỉ hiện nút Sửa cho Admin
+        {
+            <a asp-action="Edit" asp-controller="Discounts" asp-route-id="@Model.Id" class="btn btn-primary ms-2 px-4">
+                <i class="fas fa-edit me-2"></i>Sửa Mã Này
+            </a>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function copyDiscountCode(code, buttonElement) {
+            navigator.clipboard.writeText(code).then(() => {
+                // Thay đổi nút khi copy thành công
+                buttonElement.innerHTML = '<i class="fas fa-check me-2"></i>Đã Lấy Mã';
+                buttonElement.classList.remove('btn-copy-code');
+                buttonElement.classList.add('btn-copied'); // Thêm class mới
+                buttonElement.disabled = true; // Vô hiệu hóa nút tạm thời
+
+                // (Tùy chọn) Quay lại trạng thái cũ sau vài giây
+                setTimeout(() => {
+                    buttonElement.innerHTML = '<i class="far fa-copy me-2"></i>Lấy Mã';
+                    buttonElement.classList.remove('btn-copied');
+                    buttonElement.classList.add('btn-copy-code');
+                    buttonElement.disabled = false;
+                }, 3000); // 3 giây
+            }).catch(err => {
+                console.error('Lỗi sao chép: ', err);
+                alert('Sao chép thất bại!'); // Thông báo lỗi đơn giản
+            });
+        }
+    </script>
+}

@@ -1,0 +1,114 @@
+﻿@page
+@model LoginModel
+
+@{
+    ViewData["Title"] = "Đăng nhập";
+    // XÓA HOẶC COMMENT DÒNG NÀY ĐI HOÀN TOÀN: @layout = null;
+    // (Đảm bảo không có bất kỳ dòng @layout nào, kể cả layout = null; ở đây nếu bạn muốn sử dụng _Layout.cshtml)
+}
+
+
+<div class="main-content-wrapper">
+    <div class="login-card">
+        <h2>Chào mừng bạn trở lại!</h2>
+
+        <form id="account" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3" role="alert"></div>
+
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
+                <label asp-for="Input.Email" class="form-label"><i class="fas fa-envelope me-2"></i>Email</label>
+                <span asp-validation-for="Input.Email" class="text-danger"></span>
+            </div>
+
+            <div class="form-floating mb-3 password-container">
+                <input asp-for="Input.Password" class="form-control" id="password" autocomplete="current-password" aria-required="true" placeholder="password" /> <label asp-for="Input.Password" class="form-label"><i class="fas fa-lock me-2"></i>Mật khẩu</label>
+
+                <i class="fas fa-eye toggle-password" id="togglePassword"></i>
+
+                <span asp-validation-for="Input.Password" class="text-danger"></span>
+            </div>
+            <div class="form-check text-start my-3">
+                <input class="form-check-input" asp-for="Input.RememberMe" />
+                <label class="form-check-label" asp-for="Input.RememberMe">
+                    @Html.DisplayNameFor(m => m.Input.RememberMe)
+                </label>
+            </div>
+
+            <button id="login-submit" type="submit" class="btn btn-custom-dark">ĐĂNG NHẬP</button>
+        </form>
+
+        <div class="social-login-divider">Hoặc đăng nhập với</div>
+
+        @{
+            if ((Model.ExternalLogins?.Count ?? 0) == 0)
+            {
+                <p class="text-muted">
+                    Chưa có dịch vụ xác thực bên ngoài nào được cấu hình.
+                </p>
+            }
+            else
+            {
+                <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
+                    <div>
+                        @foreach (var provider in Model.ExternalLogins!)
+                        {
+                            if (provider.DisplayName == "Facebook")
+                            {
+                                <button type="submit" class="btn btn-social btn-facebook" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account">
+                                    <i class="fab fa-facebook-f"></i> Đăng nhập bằng Facebook
+                                </button>
+                            }
+                            else if (provider.DisplayName == "Google")
+                            {
+                                <button type="submit" class="btn btn-social btn-google" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account">
+                                    <i class="fab fa-google"></i> Đăng nhập bằng Google
+                                </button>
+                            }
+                            else
+                            {
+                                <button type="submit" class="btn btn-social btn-primary" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account">
+                                    Đăng nhập bằng @provider.DisplayName
+                                </button>
+                            }
+                        }
+                    </div>
+                </form>
+            }
+        }
+
+        <div class="bottom-links mt-4">
+            Chưa có tài khoản? <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl">Đăng ký ngay</a>
+        </div>
+        <div class="bottom-links">
+            <a id="forgot-password" asp-page="./ForgotPassword">Quên mật khẩu?</a>
+        </div>
+        <div class="bottom-links">
+            <a id="resend-confirmation" asp-page="./ResendEmailConfirmation">Gửi lại email xác nhận</a>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+
+            // --- Xử lý cho ô Mật khẩu ---
+            const passwordInput = document.querySelector('#password');
+            const togglePasswordIcon = document.querySelector('#togglePassword');
+
+            if (togglePasswordIcon) { // Kiểm tra xem icon có tồn tại không
+                togglePasswordIcon.addEventListener('click', function () {
+                    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                    passwordInput.setAttribute('type', type);
+
+                    // Đổi icon
+                    this.classList.toggle('fa-eye');
+                    this.classList.toggle('fa-eye-slash');
+                });
+            }
+        });
+    </script>
+}

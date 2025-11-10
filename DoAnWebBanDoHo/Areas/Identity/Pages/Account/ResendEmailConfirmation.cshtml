@@ -1,0 +1,37 @@
+﻿@page
+@model ResendEmailConfirmationModel
+@{
+    ViewData["Title"] = "Gửi lại Email Xác nhận";
+    Layout = "~/Views/Shared/_Layout.cshtml"; // Đảm bảo sử dụng layout chính
+}
+
+<div class="main-content-wrapper">
+    <div class="login-card">
+
+        <h2>@ViewData["Title"]</h2>
+        <p class="text-muted">Vui lòng nhập email của bạn. Chúng tôi sẽ gửi một liên kết xác nhận mới.</p>
+        <hr />
+
+        <form method="post">
+            <div asp-validation-summary="All" class="text-danger mb-4" role="alert"></div>
+
+            <div class="form-floating mb-4">
+                <input asp-for="Input.Email" class="form-control" aria-required="true" placeholder="Tên@vídu.com" />
+                <label asp-for="Input.Email" class="form-label">Địa chỉ Email</label>
+                <span asp-validation-for="Input.Email" class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="btn btn-lg btn-custom-dark">Gửi Lại</button>
+        </form>
+
+        <div class="bottom-links mt-3">
+            <p>
+                <a asp-page="./Login">Quay lại Đăng nhập</a>
+            </p>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

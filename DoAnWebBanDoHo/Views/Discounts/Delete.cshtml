@@ -1,0 +1,80 @@
+﻿@model DoAnWebBanDoHo.Models.Discount
+
+@{
+    ViewData["Title"] = "Chi tiết Mã Giảm Giá: " + Model.Code;
+}
+
+<div class="container py-4">
+    <h1 class="mb-4">Chi tiết Mã Giảm Giá: <span class="text-primary">@Model.Code</span></h1>
+    <hr />
+
+    <div class="card shadow-sm border-0 rounded-lg mb-4">
+        <div class="card-header bg-info text-white">
+            <h5 class="mb-0">Thông Tin Mã Giảm Giá</h5>
+        </div>
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-4">Mã Giảm Giá:</dt>
+                <dd class="col-sm-8">@Html.DisplayFor(model => model.Code)</dd>
+
+                <dt class="col-sm-4">Loại Giảm Giá:</dt>
+                <dd class="col-sm-8">@Html.DisplayFor(model => model.DiscountType)</dd>
+
+                <dt class="col-sm-4">Giá Trị:</dt>
+                <dd class="col-sm-8">
+                    @if (Model.DiscountType == "Percentage")
+                    {
+                        <span>@Model.DiscountValue.ToString("N0")%</span>
+                    }
+                    else if (Model.DiscountType == "FixedAmount")
+                    {
+                        <span>@Model.DiscountValue.ToString("C0", new System.Globalization.CultureInfo("vi-VN"))</span>
+                    }
+                    else
+                    {
+                        <span>@Html.DisplayFor(model => model.DiscountValue)</span>
+                    }
+                </dd>
+
+                <dt class="col-sm-4">Đơn Hàng Tối Thiểu:</dt>
+                <dd class="col-sm-8">
+                    @(Model.MinimumOrderAmount.HasValue? Model.MinimumOrderAmount.Value.ToString("C0", new System.Globalization.CultureInfo("vi-VN")) : "Không yêu cầu")
+                </dd>
+
+                <dt class="col-sm-4">Ngày Bắt Đầu:</dt>
+                <dd class="col-sm-8">@Html.DisplayFor(model => model.StartDate)</dd>
+
+                <dt class="col-sm-4">Ngày Kết Thúc:</dt>
+                <dd class="col-sm-8">@Html.DisplayFor(model => model.EndDate)</dd>
+
+                <dt class="col-sm-4">Kích Hoạt:</dt>
+                <dd class="col-sm-8">
+                    @if (Model.IsActive)
+                    {
+                        <span class="badge bg-success"><i class="fas fa-check-circle"></i> Có</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-danger"><i class="fas fa-times-circle"></i> Không</span>
+                    }
+                </dd>
+
+                <dt class="col-sm-4">Giới Hạn Sử Dụng:</dt>
+                <dd class="col-sm-8">
+                    @(Model.UsageLimit.HasValue? Model.UsageLimit.Value.ToString() : "Không giới hạn")
+                </dd>
+
+                <dt class="col-sm-4">Số Lần Đã Sử Dụng:</dt>
+                <dd class="col-sm-8">@Html.DisplayFor(model => model.UsedCount)</dd>
+
+                <dt class="col-sm-4">Áp dụng cho:</dt>
+                <dd class="col-sm-8">@Html.DisplayFor(model => model.AppliesTo)</dd>
+            </dl>
+        </div>
+    </div>
+
+    <div class="mt-4 text-center">
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary me-2">Sửa</a>
+        <a asp-action="Index" class="btn btn-secondary">Quay Lại Danh Sách</a>
+    </div>
+</div>

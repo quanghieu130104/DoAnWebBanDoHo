@@ -1,0 +1,26 @@
+﻿@page
+@model AccessDeniedModel
+@{
+    ViewData["Title"] = "Truy cập bị Từ chối";
+    Layout = "~/Views/Shared/_Layout.cshtml"; // Đảm bảo sử dụng layout chính
+}
+
+<div class="main-content-wrapper">
+    <div class="login-card">
+
+        <header>
+            <h1 class="text-danger mb-4">@ViewData["Title"]</h1>
+
+            <p class="text-danger fs-5">
+                Rất tiếc, bạn **không có quyền** truy cập vào tài nguyên này.
+            </p>
+        </header>
+
+        <div class="bottom-links mt-4">
+            <p class="text-muted">
+                Vui lòng đảm bảo bạn đã đăng nhập bằng tài khoản có thẩm quyền, hoặc quay lại
+                <a asp-controller="Home" asp-action="Index" class="font-weight-bold">Trang Chủ</a>.
+            </p>
+        </div>
+    </div>
+</div>
