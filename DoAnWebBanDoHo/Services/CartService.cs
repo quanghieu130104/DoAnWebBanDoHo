@@ -214,7 +214,7 @@ namespace DoAnWebBanDoHo.Services
             SaveAppliedDiscount(discount);
             return (true, "Mã giảm giá đã được áp dụng thành công!");
         }
-
+        // Setup Identity for WBDH-6
         // Xóa mã giảm giá đã áp dụng
         public void RemoveDiscount()
         {
